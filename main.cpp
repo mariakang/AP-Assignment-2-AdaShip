@@ -9,6 +9,7 @@ using namespace std;
 #include "Board.h"
 #include "Config.h"
 #include "BoardSquare.h"
+#include "BoardPrinter.h"
 
 int main() {
   Config config;
@@ -45,4 +46,7 @@ int main() {
   cout << testBoard.remainingTargets() << "\n";
   controller.torpedoRandom(player);
   cout << testBoard.remainingTargets() << "\n";
+
+  BoardPrinter printer;
+  printer.printBoardBoats(player);
 }

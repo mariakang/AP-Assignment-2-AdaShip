@@ -87,6 +87,15 @@ class Boat {
       result += ")";
       return result;
     }
+    string toStringWithDamage() {
+      string result = name_;
+      result += " (damage: ";
+      result += to_string(damage_);
+      result += " / ";
+      result += to_string(length_);
+      result += ")";
+      return result;
+    }
     Boat& operator=(const Boat& rhs) {
       if (this != &rhs) {
         name_ = rhs.name_;

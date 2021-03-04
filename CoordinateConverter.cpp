@@ -9,11 +9,25 @@ using namespace std;
 #include "Coordinate.h"
 #include "CoordinateConverter.h"
 
-/** Constructor function for CoordinateConverter. */
+/** Constructor function for CoordinateConverter (used by BoardPrinter). */
+CoordinateConverter::CoordinateConverter(int rows, int columns) {
+  // set number of rows and columns
+  rows_ = rows;
+  columns_ = rows;
+  // populate an 'alpha to column number' lookup map
+  initialiseLookup();
+}
+
+/** Constructor function for CoordinateConverter (used by GameController). */
 CoordinateConverter::CoordinateConverter(Config config) {
   // set number of rows and columns
   rows_ = config.rows();
   columns_ = config.columns();
+  // populate an 'alpha to column number' lookup map
+  initialiseLookup();
+}
+
+void CoordinateConverter::initialiseLookup() {
   // populate an 'alpha to column number' lookup map
   for (int i = 1; i <= columns_; i++) {
     alphaLookup_[columnToString(i)] = i;

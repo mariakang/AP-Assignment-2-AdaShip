@@ -14,9 +14,12 @@ class CoordinateConverter {
     int rows_;
     int columns_;
     map<string, int> alphaLookup_;
+    void initialiseLookup();
 
   public:
     CoordinateConverter() {}
+
+    CoordinateConverter(int rows, int columns);
 
     CoordinateConverter(Config config);
 
