@@ -280,10 +280,17 @@ bool GameController::removeBoat(Player& player, Boat& boat) {
   if (!boat.isPlaced()) {
     return false;
   }
+  // store the boat's start
+  Coordinate start = boat.start();
+  // reset the boat's start to (0, 0) (which isn't on the board)
+  Coordinate origin;
+  boat.setStart(origin);
+  // note: we don't care about resetting the orientation; it's only
+  // needed after the boat has been placed (and it will automatically
+  // be set again when the boat is replaced)
 
   // update the board
   Board& board = player.board();
-  Coordinate start = boat.start();
   // if the boat is placed vertically, starting from the bottom
   // of the boat and working up through the column until another
   // boat is encountered, update the squares
@@ -302,6 +309,11 @@ bool GameController::removeBoat(Player& player, Boat& boat) {
       maxLengthV++;
       Coordinate ci(i, start.column());
       BoardSquare& squarei = board.getSquare(ci);
+      // if we've gone past the start of the boat and hit another
+      // boat, exit
+      if (i < start.row() && squarei.boatId() > -1) {
+        break;
+      }
       // update the maxBoatLengthVertical
       squarei.setMaxBoatLengthVertical(maxLengthV);
       // if we're currently inside the boat, update the square's
@@ -309,13 +321,26 @@ bool GameController::removeBoat(Player& player, Boat& boat) {
       // for this square and the squares to the left
       if (i >= start.row()) {
         squarei.setBoatId(-1);
-        // update squares to the left
-
-      // if we've gone past the start, check if we've hit another
-      // boat, and exit if we have
-      } else {
-        if (squarei.boatId() > -1) {
-          break;
+        // update squares to the left; get maxBoatLengthHorizontal
+        // for the square immediately right of the boat (or 0 if at
+        // the end of the board)
+        int maxLengthH = 0;
+        if (ci.column() < board.columns()) {
+          Coordinate ciR(i, ci.column() + 1);
+          maxLengthH = board.getSquare(ciR).maxBoatLengthHorizontal();
+        }
+        // as we move left through the board, increment maxLengthH
+        // until we hit another boat
+        for (int j = ci.column(); j >= 1; j--) {
+          maxLengthH++;
+          Coordinate cij(i, j);
+          BoardSquare& squareij = board.getSquare(cij);
+          // if we've hit another boat, exit
+          if (squareij.boatId() > -1) {
+            break;
+          }
+          // update the maxBoatLengthHorizontal
+          squareij.setMaxBoatLengthHorizontal(maxLengthH);
         }
       }
     }
@@ -337,6 +362,11 @@ bool GameController::removeBoat(Player& player, Boat& boat) {
       maxLengthH++;
       Coordinate cj(start.row(), j);
       BoardSquare& squarej = board.getSquare(cj);
+      // if we've gone past the start, check if we've hit another
+      // boat, and exit if we have
+      if (j < start.column() && squarej.boatId() > -1) {
+        break;
+      }
       // update the maxBoatLengthHorizontal
       squarej.setMaxBoatLengthHorizontal(maxLengthH);
       // if we're currently inside the boat, update the square's
@@ -344,23 +374,30 @@ bool GameController::removeBoat(Player& player, Boat& boat) {
       // for this square and the squares above it
       if (j >= start.column()) {
         squarej.setBoatId(-1);
-        // update squares above
-
-      // if we've gone past the start, check if we've hit another
-      // boat, and exit if we have
-      } else {
-        if (squarej.boatId() > -1) {
-          break;
+        // update squares above; get maxBoatLengthVertical for the
+        // square immediately underneath the boat (or 0 if at the
+        // bottom of the board)
+        int maxLengthV = 0;
+        if (cj.row() < board.rows()) {
+          Coordinate cjU(cj.row() + 1, j);
+          maxLengthV = board.getSquare(cjU).maxBoatLengthVertical();
+        }
+        // as we move up through the board, increment maxLengthV
+        // until we hit another boat
+        for (int i = cj.row(); i >= 1; i--) {
+          maxLengthV++;
+          Coordinate cij(i, j);
+          BoardSquare& squareij = board.getSquare(cij);
+          // if we've hit another boat, exit
+          if (squareij.boatId() > -1) {
+            break;
+          }
+          // update the maxBoatLengthVertical
+          squareij.setMaxBoatLengthVertical(maxLengthV);
         }
       }
     }
   }
 
-  // reset the boat's start to (0, 0) (which isn't on the board)
-  Coordinate origin;
-  boat.setStart(origin);
-  // note: we don't care about resetting the orientation; it's only
-  // needed after the boat has been placed (and it will automatically
-  // be set again when the boat is replaced)
   return true;
 }
