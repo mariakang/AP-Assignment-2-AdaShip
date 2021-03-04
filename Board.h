@@ -6,11 +6,9 @@
 
 using namespace std;
 
-#include "Boat.h"
 #include "Config.h"
 #include "Coordinate.h"
 #include "BoardSquare.h"
-#include "Fleet.h"
 
 #define MAX_ROWS 80
 #define MAX_COLUMNS 80
@@ -44,6 +42,8 @@ class Board {
     BoardSquare& getSquare(Coordinate c) {
       return board_[c.row() - 1][c.column() - 1];
     }
+
+    void placeBoat(Coordinate c, int boatId);
   
     int rows() {
       return rows_;

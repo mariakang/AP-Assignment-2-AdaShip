@@ -65,6 +65,10 @@ class Boat {
     int damage() {
       return damage_;
     }
+    bool isPlaced() {
+      Coordinate origin;
+      return !start_.equals(origin);
+    }
     bool isSunk() {
       return damage_ == length_;
     }

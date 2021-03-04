@@ -9,6 +9,7 @@ class BoardSquare {
     bool hasMine_;
     int maxBoatLengthVertical_;
     int maxBoatLengthHorizontal_;
+
   public:
     BoardSquare() {
       boatId_ = -1;
