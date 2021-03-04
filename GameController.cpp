@@ -401,3 +401,48 @@ bool GameController::removeBoat(Player& player, Boat& boat) {
 
   return true;
 }
+
+/** 
+ * Places the boat with the given boatId on the given player's board, at the given
+ * Coordinate and orientation.
+ *
+ * Returns whether or not the action was completed successfully.
+ */
+bool GameController::placeBoatRandom(Player& player, int boatId) {
+  // get a random integer between 1 and 2 to determine orientation
+  int orientationPicker = randomNumber(2);
+  // if 1, vertical; if 2, horizontal
+  bool vertical = (orientationPicker == 1);
+
+  // get the length of the boat to be placed
+  int len = player.getBoat(boatId).length();
+  // get the player's board
+  Board& board = player.board();
+  // create an array to store the possible starting coordinates,
+  // keeping track of the number of items added
+  Coordinate possibleCoords[rows_ * columns_]; 
+  int possibleCoordsSize = 0;
+  // iterate over the board squares
+  for (int i = 1; i < rows_; i++) {
+    for (int j = 1; j < columns_; j++) {
+      Coordinate cij(i, j);
+      BoardSquare& squareij = board.getSquare(cij);
+      // if the orientation is vertical and maxBoatLengthVertical
+      // is at least 'len', or the orientation is horizontal and
+      // maxBoatLengthHorizontal is at least 'len', add 'cij' to
+      // 'possibleCoords' and update the size
+      if ((vertical && squareij.maxBoatLengthVertical() >= len)
+          || (!vertical && squareij.maxBoatLengthHorizontal() >= len)) {
+        possibleCoords[possibleCoordsSize] = cij;
+        possibleCoordsSize++;
+      }
+    }
+  }
+  // randomly select a coordinate from the array
+  int randomIndex = randomNumber(possibleCoordsSize) - 1;
+  Coordinate c = possibleCoords[randomIndex];
+
+  // place the boat at this coordinate using the chosen orientation
+  return placeBoat(player, boatId, c, vertical);
+}
+
