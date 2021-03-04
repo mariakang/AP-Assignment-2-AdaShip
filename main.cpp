@@ -23,8 +23,8 @@ int main() {
   
   int rows = testBoard.rows();
   int cols = testBoard.columns();
-  Coordinate test1 = controller.getCoordinate("ab12");
-  Coordinate test2 = controller.getCoordinate("ae12");
+  Coordinate test1 = controller.converter().getCoordinate("ab12");
+  Coordinate test2 = controller.converter().getCoordinate("ae12");
   int eq = test1.equals(test2);
 
   cout << rows << " x " << cols << "\n";
