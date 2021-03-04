@@ -14,12 +14,23 @@ using namespace std;
 void BoardPrinter::printBoardBoats(Player player) {
   // get player's board
   Board& board = player.board();
-  int rows = board.rows();
-  int columns = board.columns();
+  // update the number of columns (used by 'printHeader')
+  columns_ = board.columns();
   // print the header row
-  CoordinateConverter converter(rows, columns);
+  printHeader();
+  // iterate over the board
+  int rows = board.rows();
+
+}
+
+void BoardPrinter::printHeader() {
+  // create a converter with the correct number of columns;
+  // we will use this to convert column numbers into
+  // Excel-style alphabetic strings
+  CoordinateConverter converter(0, columns_);
+  // print the column headings row
   cout << "   |";
-  for (int j = 1; j <= columns; j++) {
+  for (int j = 1; j <= columns_; j++) {
     // convert the column number to an Excel-style string
     string heading = converter.columnToString(j);
     cout << " " << heading;
@@ -32,8 +43,7 @@ void BoardPrinter::printBoardBoats(Player player) {
   // print the underline
   string underlineSegment = "___";
   cout << underlineSegment << "|";
-  for (int j = 1; j <= columns; j++) {
+  for (int j = 1; j <= columns_; j++) {
     cout << underlineSegment;
   }
-  // iterate over the board
 }
