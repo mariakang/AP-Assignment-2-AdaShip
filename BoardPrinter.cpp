@@ -31,6 +31,10 @@ using namespace std;
 #define HIT_BOAT_PREFIX "\033[1;31;100m " // bold red text on grey ('bright black')
 #define BOAT_SUFFIX "\033[0m" // resets the format
 
+// define the maximum number of columns the board can
+// have before the boats key will be printed underneath
+#define COLUMNS_THRESHOLD 30
+
 void BoardPrinter::printBoardBoats(Player player) {
   // get player's board
   Board& board = player.board();
@@ -62,10 +66,33 @@ void BoardPrinter::printBoardBoats(Player player) {
         printBoatSquare(square.boatId(), square.torpedoed());
       }
     }
-    // we've reached the end of the row, so print a new line
-    cout << "\n";
+    // we've reached the end of the row; if the board is narrow enough,
+    // and the row number corresponds to a boat display ID, print a line
+    // of the boats key
+    if (columns <= COLUMNS_THRESHOLD && i <= player.fleet().size()) {
+      printBoatsKeyLine(player, i - 1);
+    } else {
+      cout << "\n";
+    }
   }
   cout << "\n";
+  // the board is wide, print the boats key underneath it 
+  if (columns > COLUMNS_THRESHOLD) {
+    printBoatsKey(player);
+  }
+}
+
+void BoardPrinter::printBoatsKey(Player player) {
+  // iterate over the player's fleet ('i' corresponds to the boatId)
+  for (int i = 0; i < player.fleet().size(); i++) {
+    printBoatsKeyLine(player, i);
+  }
+  cout << "\n";
+}
+
+void BoardPrinter::printBoatsKeyLine(Player player, int boatId) {
+  Boat& boat = player.getBoat(boatId);
+  cout << "\t" << displayId(boatId) << " - " << boat.name() << "\n";
 }
 
 void BoardPrinter::printHeader(int columns) {
@@ -95,6 +122,16 @@ void BoardPrinter::printHeader(int columns) {
 }
 
 void BoardPrinter::printBoatSquare(int boatId, bool isHit) {
+  // format the text, depending on whether the square is hit
+  if (isHit) {
+    cout << HIT_BOAT_PREFIX;
+  } else {
+    cout << BOAT_PREFIX;
+  }
+  cout << displayId(boatId) << BOAT_SUFFIX;
+}
+
+string BoardPrinter::displayId(int boatId) {
   // boatId's are zero-based (for convenience accessing boats
   // from the fleet's array), but we want the display IDs to
   // start from 1
@@ -103,11 +140,5 @@ void BoardPrinter::printBoatSquare(int boatId, bool isHit) {
   if (displayId.length() < 2) {
     displayId += " ";
   }
-  // format the text, depending on whether the square is hit
-  if (isHit) {
-    cout << HIT_BOAT_PREFIX;
-  } else {
-    cout << BOAT_PREFIX;
-  }
-  cout << displayId << BOAT_SUFFIX;
+  return displayId;
 }
