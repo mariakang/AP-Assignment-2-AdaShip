@@ -55,7 +55,7 @@ int main() {
   controller.placeRemainingBoats(player);
   printer.printBoard(player);
 
-  for (int i = 0; i < 50; i++) {
+  for (int i = 0; i < 8; i++) {
     controller.torpedoRandom(player);
     printer.printBoard(player);
     printer.printBoardOpponentView(player);

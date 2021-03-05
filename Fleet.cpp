@@ -1,5 +1,3 @@
-using namespace std;
-
 #include "Boat.h"
 #include "Fleet.h"
 

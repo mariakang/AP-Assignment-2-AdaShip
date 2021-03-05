@@ -1,5 +1,3 @@
-using namespace std;
-
 #include "Boat.h"
 #include "BoardSquare.h"
 #include "Coordinate.h"

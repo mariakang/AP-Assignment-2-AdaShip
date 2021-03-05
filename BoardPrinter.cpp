@@ -124,6 +124,7 @@ void BoardPrinter::printBoardOpponentView(Player player) {
     // we've reached the end of the row
     cout << "\n";
   }
+  cout << "\n";
 }
 
 /** Prints the boats key. */

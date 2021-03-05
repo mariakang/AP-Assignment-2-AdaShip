@@ -11,6 +11,8 @@ class Config {
     int rows_;
     int columns_;
     Fleet fleet_;
+    bool setBoardDimensions(string configLine, int index);
+    bool addBoat(string configLine, int index);
 
   public:
     Config() {
