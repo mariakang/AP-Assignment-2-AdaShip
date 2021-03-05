@@ -42,8 +42,6 @@ class Board {
     BoardSquare& getSquare(Coordinate c) {
       return board_[c.row() - 1][c.column() - 1];
     }
-
-    void placeBoat(Coordinate c, int boatId);
   
     int rows() {
       return rows_;

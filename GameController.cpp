@@ -6,6 +6,7 @@
 
 using namespace std;
 
+#include "BoardPrinter.h"
 #include "Config.h"
 #include "Coordinate.h"
 #include "CoordinateConverter.h"
@@ -397,4 +398,69 @@ bool GameController::placeRemainingBoats(Player& player) {
     }
   }
   return true;
+}
+
+/** Runs when the given player takes a turn against their opponent. */
+void GameController::takeTurn(Player& player, Player& opponent, bool salvoMode) {
+  // calculate the number of shots allowed
+  int allowedShots = 1;
+  if (salvoMode) {
+    allowedShots = player.survivingBoats();
+  }
+  // print the player's board and target board
+  BoardPrinter printer;
+  printer.printBoard(player);
+  printer.printBoardOpponentView(opponent);
+
+  // initialise an array to store input
+  string input = "";
+  string targets[allowedShots];
+  // prompt the user to enter target(s) until a valid selection has been made
+  bool validSelection = false;
+  bool autoFire = false;
+
+  while (!validSelection) {
+    if (allowedShots > 1) {
+      cout << "Enter up to " << to_string(allowedShots) << " targets (or press 'Enter' to auto-fire): ";
+    } else {
+      cout << "Enter a target (or press 'Enter' to auto-fire): ";
+    }
+    getline(cin, input);
+    if (input.length() == 0) {
+      autoFire = true;
+      validSelection = true;
+      break;
+    } else {
+      int index = 0;
+      for (int i = 0; i < input.length(); i++) {
+        // populate targets array
+      }
+      // check for any invalid targets
+      validSelection = true;
+      for (int i = 0; i < allowedShots; i++) {
+        if (!isValidCoordinate(converter_.getCoordinate(targets[i]))) {
+          cout << "Something\n";
+          validSelection = false;
+        }
+      }
+    }
+  }
+
+  // prompt the user to press a key to continue
+  promptToContinue();
+}
+
+/** Runs when the given player has won. */
+void GameController::gameEnd(Player& player) {
+  if (player.isComputer()) {
+    cout << "Oh no - you've lost! Better luck next time...\n\n";
+  } else {
+    cout << "Congratulations" << player.name() << " - you've won!\n\n";
+  }
+  promptToContinue();
+}
+
+void GameController::promptToContinue() {
+  cout << "\nPress 'Enter' to continue...\n";
+  cin.get();
 }

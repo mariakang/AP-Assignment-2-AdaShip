@@ -14,16 +14,3 @@ void Board::initialiseSquares() {
     }
   }
 }
-
-void Board::placeBoat(Coordinate c, int boatId) {
-  for (int i = 1; i <= c.row(); i++) {
-    Coordinate ci(i, c.column());
-    BoardSquare& squarei = getSquare(ci);
-    if (i < c.row()) {
-
-    } else {
-        squarei.setMaxBoatLengthVertical(0);
-    }
-  }
-
-}

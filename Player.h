@@ -28,6 +28,22 @@ class Player {
       board_ = board;
     }
 
+    string name() {
+      return name_;
+    }
+
+    bool isComputer() {
+      return isComputer_;
+    }
+
+    int survivingBoats() {
+      return survivingBoats_;
+    }
+
+    int shotsTaken() {
+      return shotsTaken_;
+    }
+
     Fleet& fleet() {
       return fleet_;
     }
@@ -44,4 +60,7 @@ class Player {
       survivingBoats_--;
     }
 
+    void incrementShotsTaken() {
+      survivingBoatshotsTaken_--;
+    }
 };

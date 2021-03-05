@@ -48,4 +48,10 @@ class GameController {
     bool placeBoatRandom(Player& player, int boatId);
 
     bool placeRemainingBoats(Player& player);
+
+    void takeTurn(Player& player, Player& opponent, bool salvoMode);
+
+    void gameEnd(Player& player);
+
+    void promptToContinue();
 };

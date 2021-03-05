@@ -10,14 +10,17 @@ class Config {
   private:
     int rows_;
     int columns_;
+    int mines_;
     Fleet fleet_;
     bool setBoardDimensions(string configLine, int index);
     bool addBoat(string configLine, int index);
+    bool setNumberOfMines(string configLine, int index);
 
   public:
     Config() {
       rows_ = 0;
       columns_ = 0;
+      mines_ = 0;
     }
 
     bool readConfigFile();

@@ -10,6 +10,7 @@ using namespace std;
 #define CONFIG_FILE_NAME "adaship_config.ini" // the name of the config file to be read
 #define BOARD "board"
 #define BOAT "boat"
+#define MINES "mines"
 
 /** Reads config file and populates Config. */
 bool Config::readConfigFile() {
@@ -48,6 +49,8 @@ bool Config::readConfigFile() {
       if (addBoat(configLine, index)) {
         boatAdded = true;
       }
+    } else if (category == MINES) {
+      setNumberOfMines(configLine, index);
     }
   }
   cout << "Fleet size: " << fleet_.size() << "\n";
@@ -131,4 +134,25 @@ bool Config::addBoat(string configLine, int index) {
   fleet_.add(boat);
   cout << "Added boat " << boat.toString() << "\n";
   return true;
+}
+
+bool Config::setNumberOfMines(string configLine, int index) {
+  string mines = "";
+  // skip over the non-numeric characters
+  while (index < configLine.length() && !isdigit(configLine[index])) {
+    index++;
+    // end of line reached => invalid config file line
+    if (index == configLine.length()) {
+      return false;
+    }
+  }
+  // add each numeric character to the 'mines' string
+  while (index < configLine.length() && isdigit(configLine[index])) {
+    mines += configLine[index];
+    index++;
+  }
+  // convert string to int and update class member
+  mines_ = stoi(mines);
+  cout << "Number of mines set to " << mines_ <<  "\n";
+  return true; 
 }
