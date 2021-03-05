@@ -27,8 +27,8 @@ using namespace std;
  
 #define WAVE "\033[34;104m ~ \033[0m"
 #define SPLASH "\033[1;104m x \033[0m"
-#define BOAT_PREFIX "\033[37;100m " // white text on red
-#define HIT_BOAT_PREFIX "\033[37;41m " // white text on grey ('bright black')
+#define BOAT_PREFIX "\033[37;100m " // white text on grey ('bright black')
+#define HIT_BOAT_PREFIX "\033[1;31;100m " // bold red text on grey ('bright black')
 #define BOAT_SUFFIX "\033[0m" // resets the format
 
 void BoardPrinter::printBoardBoats(Player player) {

@@ -49,7 +49,14 @@ int main() {
 
   BoardPrinter printer;
   printer.printBoardBoats(player);
+  
+  for (int i = 0; i < player.fleet().size(); i++) {
+    controller.placeBoatRandom(player, i);
+    printer.printBoardBoats(player);
+  }
 
-  controller.placeBoatRandom(player, 0);
-  printer.printBoardBoats(player);
+  for (int i = 0; i < 50; i++) {
+    controller.torpedoRandom(player);
+    printer.printBoardBoats(player);
+  }
 }

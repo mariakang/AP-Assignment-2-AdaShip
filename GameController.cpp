@@ -38,6 +38,7 @@ bool GameController::torpedo(Player& player, Coordinate c) {
   if (!isValidCoordinate(c)) {
     return false;
   }
+  cout << "Targeting " << converter_.coordinateToString(c) << "... ";
   Board& board = player.board();
   BoardSquare& square = board.getSquare(c);
   if (square.torpedoed()) {
@@ -52,7 +53,6 @@ bool GameController::torpedo(Player& player, Coordinate c) {
     Boat& boat = player.getBoat(square.boatId());
     boat.hit();
     if (boat.isSunk()) {
-      cout << boat.name() << " has been sunk!\n";
       player.decrementSurvivingBoats();
     }
   }
@@ -83,7 +83,6 @@ bool GameController::torpedoRandom(Player& player) {
       if (!board.getSquare(c).torpedoed()) {
         counter++;
         if (counter == target) {
-          cout << "Targeting " << converter_.coordinateToString(c) << "... ";
           return torpedo(player, c);
         }
       }
