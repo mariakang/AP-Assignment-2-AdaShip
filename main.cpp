@@ -54,10 +54,10 @@ int main() {
   printer.printBoardBoats(player);
   controller.placeRemainingBoats(player);
   printer.printBoardBoats(player);
-/*
+
   for (int i = 0; i < 50; i++) {
     controller.torpedoRandom(player);
     printer.printBoardBoats(player);
   }
-*/
+
 }

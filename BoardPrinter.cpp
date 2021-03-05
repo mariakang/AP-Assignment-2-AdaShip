@@ -18,10 +18,10 @@ using namespace std;
 //    30 -> black
 //    31 -> red
 //    32 -> green
+//    33 -> yellow/orange
 //    34 -> blue
 //    37 -> white
 //    41 -> red background
-//    46 -> cyan background
 //    100 -> bright black background
 //    104 -> bright blue background
  
@@ -30,6 +30,9 @@ using namespace std;
 #define BOAT_PREFIX "\033[37;100m " // white text on grey ('bright black')
 #define HIT_BOAT_PREFIX "\033[1;31;100m " // bold red text on grey ('bright black')
 #define BOAT_SUFFIX "\033[0m" // resets the format
+#define BOAT_KEY_PREFIX "\033[32m " // green text
+#define HIT_BOAT_KEY_PREFIX "\033[33m " // yellow/orange text
+#define SUNK_BOAT_KEY_PREFIX "\033[31m " // red text
 
 // define the maximum number of columns the board can
 // have before the boats key will be printed underneath
@@ -92,7 +95,17 @@ void BoardPrinter::printBoatsKey(Player player) {
 
 void BoardPrinter::printBoatsKeyLine(Player player, int boatId) {
   Boat& boat = player.getBoat(boatId);
-  cout << "\t" << displayId(boatId) << " - " << boat.name() << "\n";
+  cout << "\t" << displayId(boatId) << " - ";
+  if (boat.damage() > 0) {
+    if (boat.isSunk()) {
+      cout << SUNK_BOAT_KEY_PREFIX;
+    } else {
+      cout << HIT_BOAT_KEY_PREFIX;
+    }
+  } else {
+    cout << BOAT_KEY_PREFIX;
+  }
+  cout << boat.name() << BOAT_SUFFIX << "\n";
 }
 
 void BoardPrinter::printHeader(int columns) {
