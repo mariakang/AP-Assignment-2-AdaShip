@@ -380,3 +380,18 @@ bool GameController::placeBoatRandom(Player& player, int boatId) {
   return placeBoat(player, boatId, c, vertical);
 }
 
+/** Randomly places any unplaced boats on the given player's board. */
+bool GameController::placeRemainingBoats(Player& player) {
+  // iterate over the player's fleet ('i' corresponds to the boatId)
+  for (int i = 0; i < player.fleet().size(); i++) {
+    // check to see if the boat has been placed
+    Boat& boat = player.getBoat(i);
+    // if it hasn't, then place it
+    if (!boat.isPlaced()) {
+      if (!placeBoatRandom(player, i)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}

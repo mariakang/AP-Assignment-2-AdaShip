@@ -46,4 +46,6 @@ class GameController {
     bool removeBoat(Player& player, Boat& boat);
 
     bool placeBoatRandom(Player& player, int boatId);
+
+    bool placeRemainingBoats(Player& player);
 };

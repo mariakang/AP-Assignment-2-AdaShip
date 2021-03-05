@@ -57,7 +57,7 @@ void BoardPrinter::printBoardBoats(Player player) {
         } else {
           cout << WAVE;
         }
-      // if there is a boat there, print its formatted display ID
+      // if there is a boat there, print it
       } else {
         printBoatSquare(square.boatId(), square.torpedoed());
       }
@@ -99,15 +99,13 @@ void BoardPrinter::printBoatSquare(int boatId, bool isHit) {
   // from the fleet's array), but we want the display IDs to
   // start from 1
   string displayId = to_string(boatId + 1);
-  // if the ID is only one digit, add a space after
-  if (displayId.length() < 9) {
+  // if the ID is a single character, add a space after it
+  if (displayId.length() < 2) {
     displayId += " ";
   }
-  // if the boat is hit, use white text on a red background
+  // format the text, depending on whether the square is hit
   if (isHit) {
     cout << HIT_BOAT_PREFIX;
-  // otherwise, use black text on a grey ('bright black')
-  // background
   } else {
     cout << BOAT_PREFIX;
   }
