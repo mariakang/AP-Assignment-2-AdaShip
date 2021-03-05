@@ -9,13 +9,11 @@ using namespace std;
 
 class BoardPrinter {
   private:
-    int columns_;
-    void printHeader();
-
+    void printHeader(int columns);
+    void printBoatSquare(int boatId, bool isHit);
+    
   public:
-    BoardPrinter() {
-      columns_ = 0;
-    }
+    BoardPrinter() {}
 
     void printBoardBoats(Player player);
 };
