@@ -49,4 +49,7 @@ int main() {
 
   BoardPrinter printer;
   printer.printBoardBoats(player);
+
+  controller.placeBoatRandom(player, 0);
+  printer.printBoardBoats(player);
 }

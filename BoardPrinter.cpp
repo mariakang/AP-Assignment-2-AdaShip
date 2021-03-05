@@ -26,10 +26,10 @@ using namespace std;
 //    104 -> bright blue background
  
 #define WAVE "\033[34;104m ~ \033[0m"
-#define SPLASH "\033[1;104m * \033[0m"
-#define BOAT_PREFIX "\033[30;100m " // white text on red
-#define HIT_BOAT_PREFIX "\033[37;41m " // black text on grey ('bright black')
-#define BOAT_SUFFIX " \033[0m" // resets the format
+#define SPLASH "\033[1;104m x \033[0m"
+#define BOAT_PREFIX "\033[37;100m " // white text on red
+#define HIT_BOAT_PREFIX "\033[37;41m " // white text on grey ('bright black')
+#define BOAT_SUFFIX "\033[0m" // resets the format
 
 void BoardPrinter::printBoardBoats(Player player) {
   // get player's board
@@ -65,6 +65,7 @@ void BoardPrinter::printBoardBoats(Player player) {
     // we've reached the end of the row, so print a new line
     cout << "\n";
   }
+  cout << "\n";
 }
 
 void BoardPrinter::printHeader(int columns) {
@@ -85,7 +86,7 @@ void BoardPrinter::printHeader(int columns) {
   }
   cout << "\n";
   // print the underline
-  string underlineSegment = "___";
+  string underlineSegment = "---";
   cout << underlineSegment << "|";
   for (int j = 1; j <= columns; j++) {
     cout << underlineSegment;
