@@ -26,7 +26,8 @@ using namespace std;
 //    104 -> bright blue background
  
 #define WAVE "\033[34;104m ~ \033[0m"
-#define SPLASH "\033[1;104m x \033[0m"
+#define SPLASH "\033[1;104m * \033[0m"
+#define HIT "\033[1;31;100m x \033[0m"
 #define BOAT_PREFIX "\033[37;100m " // white text on grey ('bright black')
 #define HIT_BOAT_PREFIX "\033[1;31;100m " // bold red text on grey ('bright black')
 #define BOAT_SUFFIX "\033[0m" // resets the format
@@ -38,7 +39,8 @@ using namespace std;
 // have before the boats key will be printed underneath
 #define COLUMNS_THRESHOLD 30
 
-void BoardPrinter::printBoardBoats(Player player) {
+/** Prints the given player's own board, displaying their own boats. */
+void BoardPrinter::printBoard(Player player) {
   // get player's board
   Board& board = player.board();
   int rows = board.rows();
@@ -51,7 +53,7 @@ void BoardPrinter::printBoardBoats(Player player) {
     if (i <= 9) {
       cout << " ";
     }
-    cout << i << " |";
+    cout << to_string(i) << " |";
     // iterate over the columns
     for (int j = 1; j <= columns; j++) {
       // get the board square
@@ -85,6 +87,46 @@ void BoardPrinter::printBoardBoats(Player player) {
   }
 }
 
+/** Prints the opponent's view of the given player's board. */
+void BoardPrinter::printBoardOpponentView(Player player) {
+  // get player's board
+  Board& board = player.board();
+  int rows = board.rows();
+  int columns = board.columns();
+  // print the header row
+  printHeader(columns);
+  // iterate over the board
+  for (int i = 1; i <= rows; i++) {
+    // print the row number
+    if (i <= 9) {
+      cout << " ";
+    }
+    cout << to_string(i) << " |";
+    // iterate over the columns
+    for (int j = 1; j <= columns; j++) {
+      // get the board square
+      Coordinate c(i, j);
+      BoardSquare& square = board.getSquare(c);
+      // if the square has been torpedoed, check for a boat
+      if (square.torpedoed()) {
+        // if there's no boat, print a 'splash'
+        if (square.boatId() == -1) {
+          cout << SPLASH;
+        // otherwise, print a 'hit'
+        } else {
+          cout << HIT;
+        }
+      // if it hasn't been torpedoed, print a 'wave'
+      } else {
+        cout << WAVE;
+      }
+    }
+    // we've reached the end of the row
+    cout << "\n";
+  }
+}
+
+/** Prints the boats key. */
 void BoardPrinter::printBoatsKey(Player player) {
   // iterate over the player's fleet ('i' corresponds to the boatId)
   for (int i = 0; i < player.fleet().size(); i++) {
@@ -93,6 +135,7 @@ void BoardPrinter::printBoatsKey(Player player) {
   cout << "\n";
 }
 
+/** Prints a line of the boats key. */
 void BoardPrinter::printBoatsKeyLine(Player player, int boatId) {
   Boat& boat = player.getBoat(boatId);
   cout << "\t" << displayId(boatId) << " - ";
@@ -108,13 +151,14 @@ void BoardPrinter::printBoatsKeyLine(Player player, int boatId) {
   cout << boat.name() << BOAT_SUFFIX << "\n";
 }
 
+/** Prints the column headings and underline. */
 void BoardPrinter::printHeader(int columns) {
   // create a converter with the correct number of columns;
   // we will use this to convert column numbers into
   // Excel-style alphabetic strings
   CoordinateConverter converter(0, columns);
   // print the column headings row
-  cout << "   |";
+  cout << "\n   |";
   for (int j = 1; j <= columns; j++) {
     // convert the column number to an Excel-style string
     string heading = converter.columnToString(j);
@@ -134,6 +178,7 @@ void BoardPrinter::printHeader(int columns) {
   cout << "\n";
 }
 
+/** Prints a board square occupied by the given boat. */
 void BoardPrinter::printBoatSquare(int boatId, bool isHit) {
   // format the text, depending on whether the square is hit
   if (isHit) {
@@ -144,6 +189,7 @@ void BoardPrinter::printBoatSquare(int boatId, bool isHit) {
   cout << displayId(boatId) << BOAT_SUFFIX;
 }
 
+/** Returns a formatted string representing the given boatId. */
 string BoardPrinter::displayId(int boatId) {
   // boatId's are zero-based (for convenience accessing boats
   // from the fleet's array), but we want the display IDs to

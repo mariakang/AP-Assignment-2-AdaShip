@@ -18,5 +18,7 @@ class BoardPrinter {
   public:
     BoardPrinter() {}
 
-    void printBoardBoats(Player player);
+    void printBoard(Player player);
+
+    void printBoardOpponentView(Player player);
 };
