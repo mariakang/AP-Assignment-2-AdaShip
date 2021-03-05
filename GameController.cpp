@@ -19,12 +19,15 @@ GameController::GameController(Config config) {
   columns_ = config.columns();
   CoordinateConverter converter(config);
   converter_ = converter;
+  // initialise random seed (required for the numbers to be generated randomly)
+  // note: this should only be initialised once throughout the lifetime of the
+  // program (which is why it is included here instead of inside the randomNumber
+  // function)
+  srand (time(NULL));
 }
 
 /** Returns a randomly generated number between 1 and 'upperBound' inclusive. */
 int GameController::randomNumber(int upperBound) {
-  // initialize random seed (required for the numbers to be generated randomly)
-  srand (time(NULL));
   // return a random number between 1 and 'upperBound'
   return rand() % upperBound + 1;
 }
