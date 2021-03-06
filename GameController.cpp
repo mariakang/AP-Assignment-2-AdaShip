@@ -524,7 +524,7 @@ bool GameController::takeTurn(Player& player, Player& opponent, bool salvoMode) 
       return gameEnd(player);
     }
   }
-  // prompt the user to press a key to continue
+  // prompt the user to press enter to continue
   promptToContinue();
   // now it's the opponent's turn
   return takeTurn(opponent, player, salvoMode);
@@ -541,7 +541,25 @@ bool GameController::gameEnd(Player& player) {
   return true;
 }
 
+/** Prompts the user to press return before continuing. */
 void GameController::promptToContinue() {
-  cout << "\nPress 'Enter' to continue...\n";
-  cin.get();
+  string response = "";
+  cout << "\nPress 'Enter' to continue... (or 'q' to quit)\n";
+  getline(cin, response);
+  if (tolower(response[0]) == 'q') {
+    quit();
+  }
 }
+
+/** Quits the program. */
+void GameController::quit() {
+  // ask for confirmation
+  string response = "";
+  cout << "Are you sure? (Enter 'y' to confirm.)" << endl;
+  getline(cin, response);
+  if (tolower(response[0]) == 'y') {
+    // if the response begins with 'y' (ignoring case), then exit the program
+    exit(EXIT_SUCCESS);
+  }
+}
+

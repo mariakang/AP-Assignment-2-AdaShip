@@ -59,4 +59,6 @@ class GameController {
     bool gameEnd(Player& player);
 
     void promptToContinue();
+
+    void quit();
 };

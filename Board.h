@@ -28,12 +28,7 @@ class Board {
       remainingTargets_ = 0;
     }
 
-    Board(Config config) {
-      rows_ = config.rows();
-      columns_ = config.columns();
-      remainingTargets_ = rows_ * columns_;
-      initialiseSquares();
-    }
+    Board(Config config);
 
     int remainingTargets() {
       return remainingTargets_;
