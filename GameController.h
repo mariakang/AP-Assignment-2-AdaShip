@@ -19,6 +19,7 @@ class GameController {
   private:
     int rows_;
     int columns_;
+    bool showComputerBoard_;
     CoordinateConverter converter_;
 
     int randomNumber(int upperBound);
@@ -37,6 +38,10 @@ class GameController {
       return converter_;
     }
 
+    void hideComputerBoard() {
+      showComputerBoard_ = false;
+    }
+
     bool torpedo(Player& player, Coordinate c);
 
     bool torpedoRandom(Player& player);
@@ -49,9 +54,9 @@ class GameController {
 
     bool placeRemainingBoats(Player& player);
 
-    void takeTurn(Player& player, Player& opponent, bool salvoMode);
+    bool takeTurn(Player& player, Player& opponent, bool salvoMode);
 
-    void gameEnd(Player& player);
+    bool gameEnd(Player& player);
 
     void promptToContinue();
 };
