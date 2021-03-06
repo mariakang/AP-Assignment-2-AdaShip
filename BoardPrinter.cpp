@@ -31,6 +31,7 @@ using namespace std;
 #define SPLASH "\033[1;104m * \033[0m"
 #define HIT "\033[1;31;100m x \033[0m"
 #define MINE "\033[1;35;104m M \033[0m"
+#define EXPLODED_MINE "\033[1;104m M \033[0m"
 #define MINE_BOAT "\033[1;35;100m M \033[0m"
 #define BOAT_PREFIX "\033[37;100m " // white text on grey ('bright black')
 #define HIT_BOAT_PREFIX "\033[1;31;100m " // bold red text on grey ('bright black')
@@ -65,12 +66,20 @@ void BoardPrinter::printBoard(Player player, bool setupMode) {
       // get the board square
       Coordinate c(i, j);
       BoardSquare& square = board.getSquare(c);
-      // if there's no boat there, print a 'wave' or a 'splash'
+      // if there's no boat there, print a 'wave', a 'mine', or a 'splash'
       if (square.boatId() == -1) {
         if (square.torpedoed()) {
-          cout << SPLASH;
+          if (square.hasMine()) {
+            cout << EXPLODED_MINE;
+          } else {
+            cout << SPLASH;
+          }
         } else {
-          cout << WAVE;
+          if (square.hasMine()) {
+            cout << MINE;
+          } else {
+            cout << WAVE;
+          }
         }
       // if there is a boat there, print it
       } else {
