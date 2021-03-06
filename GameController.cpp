@@ -417,7 +417,13 @@ bool GameController::placeRemainingBoats(Player& player) {
   return true;
 }
 
-/** Runs when the given player takes a turn against their opponent. */
+/** 
+ * Runs when the given player takes a turn against their opponent.
+ *
+ * When the turn is complete, if the player has won, the 'gameEnd' method will be
+ * called. Otherwise, the user will be prompted to continue (or quit), and either
+ * the program will be exited, or the next turn sequence automatically launched. 
+ */
 bool GameController::takeTurn(Player& player, Player& opponent, bool salvoMode) {
   cout << "It's " << player.name() << "'s turn.\n";
   // calculate the number of shots allowed
@@ -509,6 +515,7 @@ bool GameController::takeTurn(Player& player, Player& opponent, bool salvoMode) 
       torpedoRandom(opponent);
       // print the target board
       printer.printBoardOpponentView(opponent);
+      player.incrementShotsTaken();
     // if not in autoFire mode, check that we have a target
     } else {
       if (i < targetsSize) {
@@ -516,6 +523,7 @@ bool GameController::takeTurn(Player& player, Player& opponent, bool salvoMode) 
         torpedo(opponent, c);
         // print the target board
         printer.printBoardOpponentView(opponent);
+        player.incrementShotsTaken();
       }
     }
     // check to see if we have a winner
@@ -524,7 +532,7 @@ bool GameController::takeTurn(Player& player, Player& opponent, bool salvoMode) 
       return gameEnd(player);
     }
   }
-  // prompt the user to press enter to continue
+  // prompt the user to press enter to continue (or 'q' to quit)
   promptToContinue();
   // now it's the opponent's turn
   return takeTurn(opponent, player, salvoMode);
@@ -535,7 +543,8 @@ bool GameController::gameEnd(Player& player) {
   if (player.isComputer()) {
     cout << "Oh no - you've lost! Better luck next time...\n\n";
   } else {
-    cout << "Congratulations" << player.name() << " - you've won!\n\n";
+    cout << "Congratulations" << player.name();
+    cout << " - you've won in " << to_string(player.shotsTaken()) << " shots!\n\n";
   }
   promptToContinue();
   return true;
@@ -555,10 +564,11 @@ void GameController::promptToContinue() {
 void GameController::quit() {
   // ask for confirmation
   string response = "";
-  cout << "Are you sure? (Enter 'y' to confirm.)" << endl;
+  cout << "Are you sure? (Enter 'y' to confirm.)\n" << endl;
   getline(cin, response);
   if (tolower(response[0]) == 'y') {
     // if the response begins with 'y' (ignoring case), then exit the program
+    cout << "\nGoodbye!\n";
     exit(EXIT_SUCCESS);
   }
 }

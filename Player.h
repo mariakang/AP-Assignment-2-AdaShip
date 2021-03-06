@@ -61,6 +61,6 @@ class Player {
     }
 
     void incrementShotsTaken() {
-      survivingBoatshotsTaken_--;
+      shotsTaken_--;
     }
 };
