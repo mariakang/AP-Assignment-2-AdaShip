@@ -13,11 +13,18 @@ using namespace std;
 #include "GameController.h"
 #include "Player.h"
 
+#define MAX_LOOP_COUNT 1000
+
 /** Constructor function for GameController. */
 GameController::GameController(Config config) {
   // set number of rows and columns
   rows_ = config.rows();
   columns_ = config.columns();
+  if (config.mines() < rows_) {
+    mines_ = config.mines();
+  } else {
+    mines_ = rows_;
+  }
   showComputerBoard_ = true;
   CoordinateConverter converter(config);
   converter_ = converter;
@@ -415,6 +422,29 @@ bool GameController::placeRemainingBoats(Player& player) {
     }
   }
   return true;
+}
+
+/** Randomly places mines in the given player's board. */
+bool GameController::placeMines(Player& player) {
+  int minesPlaced = 0;
+  int loopCount = 0;
+  // randomly place mines until they've all been placed, or
+  // MAX_LOOP_COUNT is exceeded
+  while (minesPlaced < mines_ && loopCount < MAX_LOOP_COUNT) {
+    loopCount++;
+    // generate a random coordinate (it doesn't matter if there's a boat)
+    int randomRow = randomNumber(rows_);
+    int randomColumn = randomNumber(columns_);
+    Coordinate c(randomRow, randomColumn);
+    // if there's no mine here already, place one (by setting hasMine to true)
+    BoardSquare& square = player.board().getSquare(c);
+    if (!square.hasMine()) {
+      square.setHasMine(true);
+      minesPlaced++;
+    }
+  }
+  // return whether or not all mines have been successfully placed
+  return minesPlaced == mines_;
 }
 
 /** 

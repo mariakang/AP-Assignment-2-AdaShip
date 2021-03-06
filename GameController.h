@@ -19,6 +19,7 @@ class GameController {
   private:
     int rows_;
     int columns_;
+    int mines_;
     bool showComputerBoard_;
     CoordinateConverter converter_;
 
@@ -53,6 +54,8 @@ class GameController {
     bool placeBoatRandom(Player& player, int boatId);
 
     bool placeRemainingBoats(Player& player);
+
+    bool placeMines(Player& player);
 
     bool takeTurn(Player& player, Player& opponent, bool salvoMode);
 

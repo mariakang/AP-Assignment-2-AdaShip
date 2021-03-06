@@ -28,9 +28,15 @@ class Config {
     int rows() {
       return rows_;
     }
+    
     int columns() {
       return columns_;
     }
+
+    int mines() {
+      return mines_;
+    }
+
     Fleet& fleet() {
       return fleet_;
     }
