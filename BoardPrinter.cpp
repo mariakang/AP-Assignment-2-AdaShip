@@ -20,6 +20,7 @@ using namespace std;
 //    32 -> green
 //    33 -> yellow/orange
 //    34 -> blue
+//    35 -> magenta
 //    37 -> white
 //    41 -> red background
 //    100 -> bright black background
@@ -28,8 +29,11 @@ using namespace std;
 #define WAVE "\033[34;104m ~ \033[0m"
 #define SPLASH "\033[1;104m * \033[0m"
 #define HIT "\033[1;31;100m x \033[0m"
+#define MINE "\033[1;35;104m M \033[0m"
+#define MINE_BOAT "\033[1;35;100m M \033[0m"
 #define BOAT_PREFIX "\033[37;100m " // white text on grey ('bright black')
 #define HIT_BOAT_PREFIX "\033[1;31;100m " // bold red text on grey ('bright black')
+#define MINE_BOAT_PREFIX "\033[1;35;100m " // bold magenta text on grey ('bright black')
 #define BOAT_SUFFIX "\033[0m" // resets the format
 #define BOAT_KEY_PREFIX "\033[32m " // green text
 #define HIT_BOAT_KEY_PREFIX "\033[33m " // yellow/orange text
@@ -109,12 +113,20 @@ void BoardPrinter::printBoardOpponentView(Player player) {
       BoardSquare& square = board.getSquare(c);
       // if the square has been torpedoed, check for a boat
       if (square.torpedoed()) {
-        // if there's no boat, print a 'splash'
+        // if there's no boat, print a 'splash' or a 'mine'
         if (square.boatId() == -1) {
-          cout << SPLASH;
-        // otherwise, print a 'hit'
+          if (square.hasMine()) {
+            cout << MINE;
+          } else {
+            cout << SPLASH;
+          }
+        // otherwise, print a 'hit' or a mine in a boat
         } else {
-          cout << HIT;
+          if (square.hasMine()) {
+            cout << MINE_BOAT;
+          } else {
+            cout << HIT;
+          }
         }
       // if it hasn't been torpedoed, print a 'wave'
       } else {
