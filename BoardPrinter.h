@@ -12,13 +12,18 @@ class BoardPrinter {
     void printHeader(int columns);
     void printBoatSquare(int boatId, bool isHit);
     string displayId(int boatId);
-    void printBoatsKeyLine(Player player, int boatId);
-    void printBoatsKey(Player player);
+    void printBoatsKeyLine(Player player, int boatId, bool setupMode);
     
   public:
     BoardPrinter() {}
 
-    void printBoard(Player player);
+    void printBoard(Player player, bool setupMode);
+
+    void printBoard(Player player) {
+      printBoard(player, /* setupMode= */ false);
+    }
 
     void printBoardOpponentView(Player player);
+
+    void printBoatsKey(Player player, bool setupMode);
 };

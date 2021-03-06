@@ -28,7 +28,7 @@ class Board {
       remainingTargets_ = 0;
     }
 
-    Board(Config config);
+    Board(int rows, int columns);
 
     int remainingTargets() {
       return remainingTargets_;

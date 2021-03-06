@@ -18,13 +18,12 @@ class Player {
     Board board_;
 
   public:
-    Player(string name, bool isComputer, Config config) {
+    Player(string name, Fleet fleet, Board board) {
       name_ = name;
-      isComputer_ = isComputer;
-      survivingBoats_ = config.fleet().size();
+      isComputer_ = false;
+      survivingBoats_ = fleet.size();
       shotsTaken_ = 0;
-      fleet_ = config.fleet().copy();
-      Board board(config);
+      fleet_ = fleet;
       board_ = board;
     }
 
@@ -32,8 +31,16 @@ class Player {
       return name_;
     }
 
+    void setName(string name) {
+      name_ = name;
+    }
+
     bool isComputer() {
       return isComputer_;
+    }
+
+    void setIsComputer(bool isComputer) {
+      isComputer_ = isComputer;
     }
 
     int survivingBoats() {

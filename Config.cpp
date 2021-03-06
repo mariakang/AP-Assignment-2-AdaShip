@@ -14,6 +14,7 @@ using namespace std;
 
 /** Reads config file and populates Config. */
 bool Config::readConfigFile() {
+  cout << "Reading config file...\n";
   // define an iterator to iterate over the config file, and a variable to
   // store the current line's contents
   ifstream configFile;
@@ -53,9 +54,10 @@ bool Config::readConfigFile() {
       setNumberOfMines(configLine, index);
     }
   }
-  cout << "Fleet size: " << fleet_.size() << "\n";
+  cout << "\tFleet size: " << fleet_.size() << "\n";
   // close the file
   configFile.close();
+  cout << "\nFinished reading config file.\n\n";
 	return (dimensionsSet && boatAdded);
 }
 
@@ -95,7 +97,7 @@ bool Config::setBoardDimensions(string configLine, int index) {
   // convert strings to ints and update class members
   rows_ = stoi(rows);
   columns_ = stoi(columns);
-  cout << "Board size set to " << rows_ << " x " << columns_ << "\n";
+  cout << "\tBoard size set to " << rows_ << " x " << columns_ << "\n";
   return true; 
 }
 
@@ -132,7 +134,7 @@ bool Config::addBoat(string configLine, int index) {
   Boat boat(name, stoi(len));
   // add the boat to the Fleet
   fleet_.add(boat);
-  cout << "Added boat " << boat.toString() << "\n";
+  cout << "\tAdded boat " << boat.toString() << "\n";
   return true;
 }
 
@@ -153,6 +155,6 @@ bool Config::setNumberOfMines(string configLine, int index) {
   }
   // convert string to int and update class member
   mines_ = stoi(mines);
-  cout << "Number of mines set to " << mines_ <<  "\n";
+  cout << "\tNumber of mines set to " << mines_ <<  "\n";
   return true; 
 }

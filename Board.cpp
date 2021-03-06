@@ -4,14 +4,14 @@
 #include "Board.h"
 #include "Fleet.h"
 
-Board::Board(Config config) {
-  if (config.rows() <= MAX_ROWS) {
-    rows_ = config.rows();
+Board::Board(int rows, int columns) {
+  if (rows <= MAX_ROWS) {
+    rows_ = rows;
   } else {
     rows_ = MAX_ROWS;
   }
-  if (config.columns() <= MAX_COLUMNS) {
-    columns_ = config.columns();
+  if (columns <= MAX_COLUMNS) {
+    columns_ = columns;
   } else {
     columns_ = MAX_COLUMNS;
   }

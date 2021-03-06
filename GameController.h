@@ -22,6 +22,7 @@ class GameController {
     int mines_;
     bool showComputerBoard_;
     CoordinateConverter converter_;
+    Fleet fleet_;
 
     int randomNumber(int upperBound);
 
@@ -39,10 +40,6 @@ class GameController {
       return converter_;
     }
 
-    void hideComputerBoard() {
-      showComputerBoard_ = false;
-    }
-
     bool torpedo(Player& player, Coordinate c);
 
     bool torpedoRandom(Player& player);
@@ -57,11 +54,17 @@ class GameController {
 
     bool placeMines(Player& player);
 
-    bool takeTurn(Player& player, Player& opponent, bool salvoMode);
+    bool gameSetup(Player& player, bool minesMode);
+    
+    bool takeTurns(Player& player, Player& opponent, bool salvoMode);
 
     bool gameEnd(Player& player);
 
     void promptToContinue();
 
     void quit();
+
+    void menu();
+
+    void launchGame(int numberOfHumanPlayers, bool salvoMode, bool minesMode);
 };

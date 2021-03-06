@@ -23,6 +23,7 @@ using namespace std;
 //    35 -> magenta
 //    37 -> white
 //    41 -> red background
+//    90 -> bright black
 //    100 -> bright black background
 //    104 -> bright blue background
  
@@ -38,13 +39,14 @@ using namespace std;
 #define BOAT_KEY_PREFIX "\033[32m " // green text
 #define HIT_BOAT_KEY_PREFIX "\033[33m " // yellow/orange text
 #define SUNK_BOAT_KEY_PREFIX "\033[31m " // red text
+#define PLACED_BOAT_PREFIX "\033[90m" // bright black text
 
 // define the maximum number of columns the board can
 // have before the boats key will be printed underneath
 #define COLUMNS_THRESHOLD 30
 
 /** Prints the given player's own board, displaying their own boats. */
-void BoardPrinter::printBoard(Player player) {
+void BoardPrinter::printBoard(Player player, bool setupMode) {
   // get player's board
   Board& board = player.board();
   int rows = board.rows();
@@ -79,7 +81,7 @@ void BoardPrinter::printBoard(Player player) {
     // and the row number corresponds to a boat display ID, print a line
     // of the boats key
     if (columns <= COLUMNS_THRESHOLD && i <= player.fleet().size()) {
-      printBoatsKeyLine(player, i - 1);
+      printBoatsKeyLine(player, i - 1, setupMode);
     } else {
       cout << "\n";
     }
@@ -87,7 +89,7 @@ void BoardPrinter::printBoard(Player player) {
   cout << "\n";
   // the board is wide, print the boats key underneath it 
   if (columns > COLUMNS_THRESHOLD) {
-    printBoatsKey(player);
+    printBoatsKey(player, setupMode);
   }
 }
 
@@ -140,26 +142,33 @@ void BoardPrinter::printBoardOpponentView(Player player) {
 }
 
 /** Prints the boats key. */
-void BoardPrinter::printBoatsKey(Player player) {
+void BoardPrinter::printBoatsKey(Player player, bool setupMode) {
   // iterate over the player's fleet ('i' corresponds to the boatId)
   for (int i = 0; i < player.fleet().size(); i++) {
-    printBoatsKeyLine(player, i);
+    printBoatsKeyLine(player, i, setupMode);
   }
   cout << "\n";
 }
 
 /** Prints a line of the boats key. */
-void BoardPrinter::printBoatsKeyLine(Player player, int boatId) {
+void BoardPrinter::printBoatsKeyLine(Player player, int boatId, bool setupMode) {
   Boat& boat = player.getBoat(boatId);
+  if (setupMode && boat.isPlaced()) {
+    cout << PLACED_BOAT_PREFIX;
+  }
   cout << "\t" << displayId(boatId) << " - ";
-  if (boat.damage() > 0) {
-    if (boat.isSunk()) {
-      cout << SUNK_BOAT_KEY_PREFIX;
+  if (!setupMode) {
+    if (boat.damage() > 0) {
+      if (boat.isSunk()) {
+        cout << SUNK_BOAT_KEY_PREFIX;
+      } else {
+        cout << HIT_BOAT_KEY_PREFIX;
+      }
     } else {
-      cout << HIT_BOAT_KEY_PREFIX;
+      cout << BOAT_KEY_PREFIX;
     }
   } else {
-    cout << BOAT_KEY_PREFIX;
+    cout << " ";
   }
   cout << boat.name() << BOAT_SUFFIX << "\n";
 }

@@ -28,6 +28,8 @@ GameController::GameController(Config config) {
   showComputerBoard_ = true;
   CoordinateConverter converter(config);
   converter_ = converter;
+  fleet_ = config.fleet().copy();
+
   // initialise random seed (required for the numbers to be generated randomly)
   // note: this should only be initialised once throughout the lifetime of the
   // program (which is why it is included here instead of inside the randomNumber
@@ -447,6 +449,102 @@ bool GameController::placeMines(Player& player) {
   return minesPlaced == mines_;
 }
 
+bool GameController::gameSetup(Player& player,  bool minesMode) {
+  BoardPrinter printer;
+
+  if (player.isComputer()) {
+    if (!placeRemainingBoats(player)) {
+      cout << "Couldn't place Computer's boats.\n";
+      return false;
+    } else {
+      cout << "Computer's boats have all been placed\n.";
+      if (showComputerBoard_) {
+        printer.printBoard(player);
+      }
+    }
+  } else {
+    int placedBoats = 0;
+    int fleetSize = player.fleet().size();
+    string input = "";
+    while (placedBoats < fleetSize) {
+      printer.printBoard(player, /* setupMode= */ true);
+      cout << "Enter a boat number, a grid reference and 'v/h' ";
+      cout << "(e.g. '1 a1 v'), or press 'Enter' to auto-place your remaining boats: ";
+      getline(cin, input);
+      if (input.length() == 0) {
+        if (!placeRemainingBoats(player)) {
+          cout << "Unable to auto-place your remaining boats.\n";
+          return false;
+        } else {
+          placedBoats = fleetSize;
+        }
+      } else {
+        string boatNumber = "";
+        string reference = "";
+        string vh = "";
+        int index = 0;
+        while (index < input.length() && isdigit(input[index])) {
+          boatNumber += input[index];
+          index++;
+        }
+        while (index < input.length() && !isalpha(input[index])) {
+          index++;
+        }
+        while (index < input.length() && input[index] != ' ') {
+          reference += input[index];
+          index++;
+        }
+        while (index < input.length() && !isalpha(input[index])) {
+          index++;
+        }
+        if (index < input.length()) {
+          vh += input[index];
+        }
+        bool validInput = true;
+        if (boatNumber.length() == 0 || stoi(boatNumber) > fleetSize || stoi(boatNumber) == 0) {
+          cout << "You must enter a valid boat number.\n";
+          validInput = false;
+        }
+        if (reference.length() == 0 || !isValidCoordinate(converter_.getCoordinate(reference))) {
+          cout << "You must enter a valid grid reference.\n";
+          validInput = false;
+        }
+        if (vh.length() != 1 || (tolower(vh[0]) != 'v' && tolower(vh[0]) != 'h')) {
+          cout << "You must enter a valid orientation (v/h).\n";
+          validInput = false;
+        }
+        if (validInput) {
+          int boatId = stoi(boatNumber) - 1;
+          Coordinate c = converter_.getCoordinate(reference);
+          bool vertical = tolower(vh[0]) == 'v';
+          if (!placeBoat(player, boatId, c, vertical)) {
+            cout << "Unable to place boat " << boatNumber << " in " << reference << "\n."; 
+          } else {
+            placedBoats++;
+          }
+        }
+      }
+      if (placedBoats == fleetSize) {
+        cout << "All of your boats have now been placed.\n";
+        printer.printBoard(player, /* setupMode= */ true);
+      }
+    }
+  }
+
+  if (minesMode) {
+    cout << "Placing mines... ";
+    if (placeMines(player)) {
+      cout << mines_ << " mines have been placed.\n";
+      printer.printBoard(player);
+    } else {
+      cout << "Unable to place mines.\n";
+    }
+  }
+
+  promptToContinue();
+  return true;
+}
+
 /** 
  * Runs when the given player takes a turn against their opponent.
  *
@@ -454,7 +552,7 @@ bool GameController::placeMines(Player& player) {
  * called. Otherwise, the user will be prompted to continue (or quit), and either
  * the program will be exited, or the next turn sequence automatically launched. 
  */
-bool GameController::takeTurn(Player& player, Player& opponent, bool salvoMode) {
+bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode) {
   cout << "It's " << player.name() << "'s turn.\n";
   // calculate the number of shots allowed
   int allowedShots = 1;
@@ -462,11 +560,9 @@ bool GameController::takeTurn(Player& player, Player& opponent, bool salvoMode) 
     allowedShots = player.survivingBoats();
   }
 
+  // check whether the player is the computer
   bool isComputer = player.isComputer();
-  // if the player is the computer, we don't need to ask for input
-  bool validSelection = isComputer;
-  bool autoFire = isComputer;
-  
+
   // print the player's board and target board (unless disabled)
   BoardPrinter printer;
   if (!isComputer || showComputerBoard_) {
@@ -474,6 +570,12 @@ bool GameController::takeTurn(Player& player, Player& opponent, bool salvoMode) 
     printer.printBoardOpponentView(opponent);  
   }
 
+  // if the player is the computer, we will use autoFire mode, and
+  // we will set validSelection to true, so that the user won't be
+  // asked for input
+  bool validSelection = isComputer;
+  bool autoFire = isComputer;
+  
   // initialise an array to store input
   string input = "";
   string targets[allowedShots];
@@ -565,7 +667,7 @@ bool GameController::takeTurn(Player& player, Player& opponent, bool salvoMode) 
   // prompt the user to press enter to continue (or 'q' to quit)
   promptToContinue();
   // now it's the opponent's turn
-  return takeTurn(opponent, player, salvoMode);
+  return takeTurns(opponent, player, salvoMode);
 }
 
 /** Runs when the given player has won. */
@@ -583,10 +685,12 @@ bool GameController::gameEnd(Player& player) {
 /** Prompts the user to press return before continuing. */
 void GameController::promptToContinue() {
   string response = "";
-  cout << "\nPress 'Enter' to continue... (or 'q' to quit)\n";
+  cout << "\nPress 'Enter' to continue... ('r' to return to the main menu or 'q' to quit)\n";
   getline(cin, response);
   if (tolower(response[0]) == 'q') {
     quit();
+  } else if (tolower(response[0]) == 'r') {
+    menu();
   }
 }
 
@@ -603,3 +707,71 @@ void GameController::quit() {
   }
 }
 
+/** Displays the main menu. */
+void GameController::menu() {
+  cout << "Welcome to AdaShip!\n\n";
+  while (true) {
+    string input = "";
+    cout << "Please select an option:\n";
+    cout << "\t1 - One player v computer game\n";
+    cout << "\t2 - Two player game\n";
+    cout << "\t3 - One player v computer (salvo mode)\n";
+    cout << "\t4 - Two player game (salvo mode)\n";
+    cout << "\t5 - One player v computer (hidden mines)\n";
+    cout << "\t6 - Two player game (hidden mines)\n";
+    cout << "\t7 - Computer v computer (hidden mines)\n";
+    cout << "\t8 - One player v computer (salvo mode with hidden mines)\n";
+    cout << "\t9 - Two player game (salvo mode with hidden mines)\n";
+    cout << "\tq - Quit\n\n";
+    getline(cin, input);
+    if (input.length() == 1) {
+      char choice = input[0];
+      switch (choice) {
+        case '1': launchGame(/* players= */ 1, /* salvoMode= */ false, /* minesMode= */ false);
+        case '2': launchGame(/* players= */ 2, /* salvoMode= */ false, /* minesMode= */ false);
+        case '3': launchGame(/* players= */ 1, /* salvoMode= */ true, /* minesMode= */ false);
+        case '4': launchGame(/* players= */ 2, /* salvoMode= */ true, /* minesMode= */ false);
+        case '5': launchGame(/* players= */ 1, /* salvoMode= */ false, /* minesMode= */ true);
+        case '6': launchGame(/* players= */ 2, /* salvoMode= */ false, /* minesMode= */ true);
+        case '7': launchGame(/* players= */ 0, /* salvoMode= */ false, /* minesMode= */ true);
+        case '8': launchGame(/* players= */ 1, /* salvoMode= */ true, /* minesMode= */ true);
+        case '9': launchGame(/* players= */ 2, /* salvoMode= */ true, /* minesMode= */ true);
+        case 'q': quit();
+        default: cout << "Please enter a valid option.\n\n";
+      }
+    } else {
+      cout << "Please enter a valid option.\n\n";
+    }
+  }
+}
+
+void GameController::launchGame(int numberOfHumanPlayers, bool salvoMode, bool minesMode) {
+  Board board1(rows_, columns_);
+  Player player1("Player 1", fleet_.copy(), board1);
+  Board board2(rows_, columns_);
+  Player player2("Player 2", fleet_.copy(), board2);
+
+  if (numberOfHumanPlayers < 2) {
+    if (numberOfHumanPlayers == 1) {
+      player2.setName("Computer");
+      player2.setIsComputer(true);
+    } else if (numberOfHumanPlayers == 0) {
+      player1.setName("Computer 1");
+      player1.setIsComputer(true);
+      player2.setName("Computer 2");
+      player2.setIsComputer(true);
+    }
+    string input = "";
+    cout << "Would you like to hide the computer's board? (Enter 'y' or the board will be shown): ";
+    getline(cin, input);
+    if (input.length() > 0 && tolower(input[0]) == 'y') {
+      showComputerBoard_ = false;
+    }
+  }
+  cout << "\nSetting up board for " << player1.name() << "...\n";
+  gameSetup(player1, minesMode);
+  cout << "\nSetting up board for " << player2.name() << "...\n";
+  gameSetup(player2, minesMode);
+
+  takeTurns(player1, player2, salvoMode);
+}
