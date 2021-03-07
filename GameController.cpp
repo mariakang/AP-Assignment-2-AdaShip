@@ -662,6 +662,7 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
       }
     }
   }
+  cout << "\n";
   // for each allowed shot, fire a torpedo at the opponent's
   // board; if fewer than the allowed number of targets were
   // specified, then only fire a torpedo at the specified
@@ -698,9 +699,9 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
 /** Runs when the given player has won. */
 bool GameController::gameEnd(Player& player) {
   if (player.isComputer()) {
-    cout << "\nOh no - you've lost! Better luck next time...\n\n";
+    cout << "\nOh no, you've lost! Better luck next time...\n\n";
   } else {
-    cout << "Congratulations " << player.name();
+    cout << "\nCongratulations " << player.name();
     cout << "! You've won in " << to_string(player.shotsTaken()) << " shots!\n\n";
   }
   pause();
@@ -735,7 +736,7 @@ void GameController::quit() {
 
 /** Displays the main menu. */
 void GameController::menu() {
-  cout << "Welcome to AdaShip!\n\n";
+  cout << "\nWelcome to AdaShip!\n\n";
   pause();
   while (true) {
     string input = "";
