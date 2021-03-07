@@ -98,6 +98,7 @@ bool GameController::torpedo(Player& player, Coordinate c) {
       }
     }
   }
+  pause();
   return true;
 }
 
@@ -678,7 +679,6 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
         Coordinate c = converter_.getCoordinate(targets[i]);
         torpedo(opponent, c);
       }
-      pause();
       // print the target board
       printer.printBoardOpponentView(opponent);
       player.incrementShotsTaken();
