@@ -30,6 +30,9 @@ class Coordinate {
     bool equals(Coordinate c) {
       return c.row() == row_ && c.column() == column_;
     }
+    bool isOrigin() {
+      return row_ == 0 && column_ == 0;
+    }
     Coordinate& operator=(const Coordinate& rhs) {
       if (this != &rhs) {
         row_ = rhs.row_;

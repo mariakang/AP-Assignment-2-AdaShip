@@ -140,16 +140,25 @@ bool GameController::placeBoat(Player& player, int boatId, Coordinate c, bool ve
   Board& board = player.board();
   BoardSquare& square = board.getSquare(c);
   Boat& boat = player.getBoat(boatId);
-  // if the boat length exceeds the maximum that can be placed in the square
-  // (for the given orientation) return false
-  if ((vertical && square.maxBoatLengthVertical() < boat.length())
-        || (!vertical && square.maxBoatLengthHorizontal() < boat.length())) {
-    return false;
-  }
-  // if the boat already has a start Coordinate (which isn't equal to (0, 0))
-  // then the boat needs to be removed from the board first
+
+  // if the boat is already placed, then it will need to be removed; this must
+  // happen before checking if the coordinate is valid (as removing the boat 
+  // could make a previously invalid square valid), but we need to take note of
+  // where it was, in case it can't be placed at the coordinate provided
+  Coordinate originalStart = boat.start();
   if (boat.isPlaced()) {
     removeBoat(player, boat);
+  }
+
+  // if the boat length exceeds the maximum that can be placed in the square
+  // (for the given orientation), return false
+  if ((vertical && square.maxBoatLengthVertical() < boat.length())
+        || (!vertical && square.maxBoatLengthHorizontal() < boat.length())) {
+    // if the boat had previously been placed, replace it 
+    if (!originalStart.isOrigin()) {
+      placeBoat(player, boatId, originalStart, boat.vertical());
+    }
+    return false;
   }
 
   boat.setStart(c);
@@ -568,7 +577,7 @@ bool GameController::gameSetup(Player& player,  bool minesMode) {
  * the program will be exited, or the next turn sequence automatically launched. 
  */
 bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode) {
-  cout << "\nIt's " << player.name() << "'s turn.\n\n";
+  cout << "\nIt's " << player.name() << "'s turn.\n";
   // if it's a two player game, the players may need to get into position, so prompt
   // to continue; otherwise just pause briefly.
   if (!player.isComputer() && !opponent.isComputer()) {
@@ -588,7 +597,7 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
   // print the player's board and target board (unless disabled)
   BoardPrinter printer;
   if (!isComputer || showComputerBoard_) {
-    cout << "Boats:\n";
+    cout << "\nBoats:\n";
     printer.printBoard(player);
     pause();
     cout << "Targets:\n";
@@ -725,7 +734,7 @@ void GameController::promptToContinue() {
 void GameController::quit() {
   // ask for confirmation
   string response = "";
-  cout << "Are you sure? (Enter 'y' to confirm.)\n" << endl;
+  cout << "Are you sure? (Enter 'y' to confirm): ";
   getline(cin, response);
   if (tolower(response[0]) == 'y') {
     // if the response begins with 'y' (ignoring case), then exit the program
