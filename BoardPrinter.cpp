@@ -5,6 +5,7 @@ using namespace std;
 
 #include "Board.h"
 #include "BoardPrinter.h"
+#include "BoardSquare.h"
 #include "Boat.h"
 #include "Config.h"
 #include "Coordinate.h"
@@ -21,21 +22,23 @@ using namespace std;
 //    33 -> yellow/orange
 //    34 -> blue
 //    35 -> magenta
-//    37 -> white
 //    41 -> red background
 //    90 -> bright black
+//    95 -> bright magenta
+//    97 -> bright white
 //    100 -> bright black background
 //    104 -> bright blue background
  
 #define WAVE "\033[34;104m ~ \033[0m"
-#define SPLASH "\033[1;104m * \033[0m"
+#define SPLASH "\033[1;97;104m * \033[0m"
 #define HIT "\033[1;31;100m x \033[0m"
 #define MINE "\033[1;35;104m M \033[0m"
 #define EXPLODED_MINE "\033[1;104m M \033[0m"
-#define MINE_BOAT "\033[1;35;100m M \033[0m"
-#define BOAT_PREFIX "\033[37;100m " // white text on grey ('bright black')
+#define MINE_BOAT "\033[1;95;100m M \033[0m"
+#define BOAT_PREFIX "\033[97;100m " // white text on grey ('bright black')
 #define HIT_BOAT_PREFIX "\033[1;31;100m " // bold red text on grey ('bright black')
-#define MINE_BOAT_PREFIX "\033[1;35;100m " // bold magenta text on grey ('bright black')
+#define EXPLODED_MINE_BOAT_PREFIX "\033[1;95;100m " // bold magenta text on grey ('bright black')
+#define MINE_BOAT_PREFIX "\033[1;95;100m " // bold magenta text on grey ('bright black')
 #define BOAT_SUFFIX "\033[0m" // resets the format
 #define BOAT_KEY_PREFIX "\033[32m " // green text
 #define HIT_BOAT_KEY_PREFIX "\033[33m " // yellow/orange text
@@ -83,7 +86,7 @@ void BoardPrinter::printBoard(Player player, bool setupMode) {
         }
       // if there is a boat there, print it
       } else {
-        printBoatSquare(square.boatId(), square.torpedoed());
+        printBoatSquare(square);
       }
     }
     // we've reached the end of the row; if the board is narrow enough,
@@ -179,7 +182,12 @@ void BoardPrinter::printBoatsKeyLine(Player player, int boatId, bool setupMode) 
   } else {
     cout << " ";
   }
-  cout << boat.name() << BOAT_SUFFIX << "\n";
+  if (setupMode) {
+    cout << boat.toString();
+  } else {
+    cout << boat.name();
+  }
+  cout << BOAT_SUFFIX << "\n";
 }
 
 /** Prints the column headings and underline. */
@@ -210,14 +218,22 @@ void BoardPrinter::printHeader(int columns) {
 }
 
 /** Prints a board square occupied by the given boat. */
-void BoardPrinter::printBoatSquare(int boatId, bool isHit) {
-  // format the text, depending on whether the square is hit
-  if (isHit) {
-    cout << HIT_BOAT_PREFIX;
+void BoardPrinter::printBoatSquare(BoardSquare square) {
+  // format the text, depending on whether the square is hit and/or has a mine
+  if (square.torpedoed()) {
+    if (square.hasMine()) {
+      cout << EXPLODED_MINE_BOAT_PREFIX;
+    } else {
+      cout << HIT_BOAT_PREFIX;
+    }
   } else {
-    cout << BOAT_PREFIX;
+    if (square.hasMine()) {
+      cout << MINE_BOAT_PREFIX;
+    } else {
+      cout << BOAT_PREFIX;
+    }
   }
-  cout << displayId(boatId) << BOAT_SUFFIX;
+  cout << displayId(square.boatId()) << BOAT_SUFFIX;
 }
 
 /** Returns a formatted string representing the given boatId. */

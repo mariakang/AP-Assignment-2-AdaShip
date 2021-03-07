@@ -5,12 +5,13 @@
 
 using namespace std;
 
+#include "BoardSquare.h"
 #include "Player.h"
 
 class BoardPrinter {
   private:
     void printHeader(int columns);
-    void printBoatSquare(int boatId, bool isHit);
+    void printBoatSquare(BoardSquare square);
     string displayId(int boatId);
     void printBoatsKeyLine(Player player, int boatId, bool setupMode);
     

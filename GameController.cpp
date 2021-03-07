@@ -3,6 +3,8 @@
 #include <iterator>
 #include <string>
 #include <time.h>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 
@@ -14,6 +16,7 @@ using namespace std;
 #include "Player.h"
 
 #define MAX_LOOP_COUNT 1000
+#define PAUSE_IN_SECONDS 1
 
 /** Constructor function for GameController. */
 GameController::GameController(Config config) {
@@ -457,10 +460,11 @@ bool GameController::gameSetup(Player& player,  bool minesMode) {
       cout << "Couldn't place Computer's boats.\n";
       return false;
     } else {
-      cout << "Computer's boats have all been placed\n.";
       if (showComputerBoard_) {
         printer.printBoard(player);
+        pause();
       }
+      cout << "Computer's boats have all been placed.\n";
     }
   } else {
     int placedBoats = 0;
@@ -468,12 +472,13 @@ bool GameController::gameSetup(Player& player,  bool minesMode) {
     string input = "";
     while (placedBoats < fleetSize) {
       printer.printBoard(player, /* setupMode= */ true);
-      cout << "Enter a boat number, a grid reference and 'v/h' ";
+      cout << "Enter a boat number, reference and 'v/h' ";
       cout << "(e.g. '1 a1 v'), or press 'Enter' to auto-place your remaining boats: ";
       getline(cin, input);
       if (input.length() == 0) {
         if (!placeRemainingBoats(player)) {
-          cout << "Unable to auto-place your remaining boats.\n";
+          cout << "\nUnable to auto-place your remaining boats.\n";
+          pause();
           return false;
         } else {
           placedBoats = fleetSize;
@@ -518,23 +523,29 @@ bool GameController::gameSetup(Player& player,  bool minesMode) {
           Coordinate c = converter_.getCoordinate(reference);
           bool vertical = tolower(vh[0]) == 'v';
           if (!placeBoat(player, boatId, c, vertical)) {
-            cout << "Unable to place boat " << boatNumber << " in " << reference << "\n."; 
+            cout << "Unable to place boat " << boatNumber << " in " << reference << "\n.";
+            pause(); 
           } else {
             placedBoats++;
           }
+        } else {
+          pause();
         }
       }
       if (placedBoats == fleetSize) {
-        cout << "All of your boats have now been placed.\n";
-        printer.printBoard(player, /* setupMode= */ true);
+        printer.printBoard(player);
+        pause();
+        cout << "\nAll of your boats have now been placed.\n";
+        pause();
       }
     }
   }
 
   if (minesMode) {
-    cout << "Placing mines... ";
+    cout << "\nPlacing mines... ";
     if (placeMines(player)) {
       cout << mines_ << " mines have been placed.\n";
+      pause();
       printer.printBoard(player);
     } else {
       cout << "Unable to place mines.\n";
@@ -554,6 +565,13 @@ bool GameController::gameSetup(Player& player,  bool minesMode) {
  */
 bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode) {
   cout << "It's " << player.name() << "'s turn.\n";
+  // if it's a two player game, the players may need to get into position, so prompt
+  // to continue; otherwise just pause briefly.
+  if (!player.isComputer() && !opponent.isComputer()) {
+    promptToContinue();
+  } else {
+    pause();
+  }
   // calculate the number of shots allowed
   int allowedShots = 1;
   if (salvoMode) {
@@ -566,8 +584,12 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
   // print the player's board and target board (unless disabled)
   BoardPrinter printer;
   if (!isComputer || showComputerBoard_) {
+    cout << "Boats:\n";
     printer.printBoard(player);
-    printer.printBoardOpponentView(opponent);  
+    pause();
+    cout << "Targets:\n";
+    printer.printBoardOpponentView(opponent);
+    pause();  
   }
 
   // if the player is the computer, we will use autoFire mode, and
@@ -585,9 +607,9 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
   // will be taken)
   while (!validSelection) {
     if (allowedShots > 1) {
-      cout << "Enter up to " << to_string(allowedShots) << " targets (or press 'Enter' to auto-fire): ";
+      cout << "\nEnter up to " << to_string(allowedShots) << " targets (or press 'Enter' to auto-fire): ";
     } else {
-      cout << "Enter a target (or press 'Enter' to auto-fire): ";
+      cout << "\nEnter a target (or press 'Enter' to auto-fire): ";
     }
     getline(cin, input);
     // if the input string is empty, set autoFire and validSelection to true,
@@ -642,26 +664,26 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
   // specified, then only fire a torpedo at the specified
   // targets
   for (int i = 0; i < allowedShots; i++) {
-    // if in autoFire mode, pick a target randomly
-    if (autoFire) {
-      torpedoRandom(opponent);
+    // make sure we have a target
+    if (autoFire || i < targetsSize) {
+      // if in autoFire mode, pick a target randomly
+      if (autoFire) {
+        torpedoRandom(opponent);
+      // if not in autoFire mode, get the coordinate of the target
+      } else {
+        Coordinate c = converter_.getCoordinate(targets[i]);
+        torpedo(opponent, c);
+      }
+      pause();
       // print the target board
       printer.printBoardOpponentView(opponent);
       player.incrementShotsTaken();
-    // if not in autoFire mode, check that we have a target
-    } else {
-      if (i < targetsSize) {
-        Coordinate c = converter_.getCoordinate(targets[i]);
-        torpedo(opponent, c);
-        // print the target board
-        printer.printBoardOpponentView(opponent);
-        player.incrementShotsTaken();
+      pause();
+      // check to see if we have a winner
+      if (opponent.survivingBoats() == 0) {
+        // if so, run the gameEnd function
+        return gameEnd(player);
       }
-    }
-    // check to see if we have a winner
-    if (opponent.survivingBoats() == 0) {
-      // if so, run the gameEnd function
-      return gameEnd(player);
     }
   }
   // prompt the user to press enter to continue (or 'q' to quit)
@@ -673,11 +695,12 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
 /** Runs when the given player has won. */
 bool GameController::gameEnd(Player& player) {
   if (player.isComputer()) {
-    cout << "Oh no - you've lost! Better luck next time...\n\n";
+    cout << "\nOh no - you've lost! Better luck next time...\n\n";
   } else {
     cout << "Congratulations" << player.name();
     cout << " - you've won in " << to_string(player.shotsTaken()) << " shots!\n\n";
   }
+  pause();
   promptToContinue();
   return true;
 }
@@ -685,7 +708,7 @@ bool GameController::gameEnd(Player& player) {
 /** Prompts the user to press return before continuing. */
 void GameController::promptToContinue() {
   string response = "";
-  cout << "\nPress 'Enter' to continue... ('r' to return to the main menu or 'q' to quit)\n";
+  cout << "\nPress 'Enter' to continue... ('r' to return to the main menu or 'q' to quit): ";
   getline(cin, response);
   if (tolower(response[0]) == 'q') {
     quit();
@@ -710,6 +733,7 @@ void GameController::quit() {
 /** Displays the main menu. */
 void GameController::menu() {
   cout << "Welcome to AdaShip!\n\n";
+  pause();
   while (true) {
     string input = "";
     cout << "Please select an option:\n";
@@ -762,16 +786,24 @@ void GameController::launchGame(int numberOfHumanPlayers, bool salvoMode, bool m
       player2.setIsComputer(true);
     }
     string input = "";
-    cout << "Would you like to hide the computer's board? (Enter 'y' or the board will be shown): ";
+    cout << "\nWould you like to hide the computer's board? (Enter 'y' or the board will be shown): ";
     getline(cin, input);
     if (input.length() > 0 && tolower(input[0]) == 'y') {
       showComputerBoard_ = false;
     }
   }
   cout << "\nSetting up board for " << player1.name() << "...\n";
+  pause();
   gameSetup(player1, minesMode);
   cout << "\nSetting up board for " << player2.name() << "...\n";
+  pause();
   gameSetup(player2, minesMode);
 
   takeTurns(player1, player2, salvoMode);
+}
+
+/** Blocks further execution for PAUSE_IN_SECONDS seconds. */
+void GameController::pause() {
+  // convert seconds to milliseconds
+  this_thread::sleep_for(chrono::milliseconds(PAUSE_IN_SECONDS * 1000));
 }

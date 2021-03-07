@@ -62,6 +62,8 @@ class GameController {
 
     void promptToContinue();
 
+    void pause();
+
     void quit();
 
     void menu();
