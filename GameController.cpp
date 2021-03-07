@@ -465,6 +465,7 @@ bool GameController::gameSetup(Player& player,  bool minesMode) {
         pause();
       }
       cout << "Computer's boats have all been placed.\n";
+      pause();
     }
   } else {
     int placedBoats = 0;
@@ -546,7 +547,9 @@ bool GameController::gameSetup(Player& player,  bool minesMode) {
     if (placeMines(player)) {
       cout << mines_ << " mines have been placed.\n";
       pause();
-      printer.printBoard(player);
+      if (!player.isComputer() || showComputerBoard_) {
+        printer.printBoard(player);
+      }
     } else {
       cout << "Unable to place mines.\n";
     }
@@ -564,7 +567,7 @@ bool GameController::gameSetup(Player& player,  bool minesMode) {
  * the program will be exited, or the next turn sequence automatically launched. 
  */
 bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode) {
-  cout << "It's " << player.name() << "'s turn.\n";
+  cout << "\nIt's " << player.name() << "'s turn.\n\n";
   // if it's a two player game, the players may need to get into position, so prompt
   // to continue; otherwise just pause briefly.
   if (!player.isComputer() && !opponent.isComputer()) {
@@ -647,7 +650,7 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
       }
       // check for any invalid targets
       validSelection = true;
-      for (int i = 0; i < allowedShots; i++) {
+      for (int i = 0; i < allowedShots && i < arrayIndex; i++) {
         if (!isValidCoordinate(converter_.getCoordinate(targets[i]))) {
           cout << "'" << targets[i] << "' is not a valid target.\n";
           validSelection = false;
@@ -697,8 +700,8 @@ bool GameController::gameEnd(Player& player) {
   if (player.isComputer()) {
     cout << "\nOh no - you've lost! Better luck next time...\n\n";
   } else {
-    cout << "Congratulations" << player.name();
-    cout << " - you've won in " << to_string(player.shotsTaken()) << " shots!\n\n";
+    cout << "Congratulations " << player.name();
+    cout << "! You've won in " << to_string(player.shotsTaken()) << " shots!\n\n";
   }
   pause();
   promptToContinue();

@@ -68,6 +68,6 @@ class Player {
     }
 
     void incrementShotsTaken() {
-      shotsTaken_--;
+      shotsTaken_++;
     }
 };
