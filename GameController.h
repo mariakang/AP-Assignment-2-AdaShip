@@ -23,6 +23,7 @@ class GameController {
     bool showComputerBoard_;
     bool useTargetingAlgorithm_;
     int pause_;
+    bool prompt_;
     CoordinateConverter converter_;
     Fleet fleet_;
 
@@ -30,6 +31,9 @@ class GameController {
     void calculateProbabilities(Player& player);
     void removePause() {
       pause_ = 0;
+    }
+    void removePrompt() {
+      prompt_ = false;
     }
 
   public:

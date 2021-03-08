@@ -31,6 +31,7 @@ GameController::GameController(Config config) {
   }
   showComputerBoard_ = true;
   pause_ = PAUSE_IN_SECONDS;
+  prompt_ = true;
   CoordinateConverter converter(config);
   converter_ = converter;
   fleet_ = config.fleet().copy();
@@ -906,13 +907,15 @@ bool GameController::gameEnd(Player& player) {
 
 /** Prompts the user to press return before continuing. */
 void GameController::promptToContinue() {
-  string response = "";
-  cout << "\nPress 'Enter' to continue... ('r' to return to the main menu or 'q' to quit): ";
-  getline(cin, response);
-  if (tolower(response[0]) == 'q') {
-    quit();
-  } else if (tolower(response[0]) == 'r') {
-    menu();
+  if (prompt_) {
+    string response = "";
+    cout << "\nPress 'Enter' to continue... ('r' to return to the main menu or 'q' to quit): ";
+    getline(cin, response);
+    if (tolower(response[0]) == 'q') {
+      quit();
+    } else if (tolower(response[0]) == 'r') {
+      menu();
+    }
   }
 }
 
@@ -979,6 +982,7 @@ void GameController::launchGame(int numberOfHumanPlayers, bool salvoMode, bool m
       player2.setName("Computer");
       player2.setIsComputer(true);
     } else if (numberOfHumanPlayers == 0) {
+      removePrompt();
       player1.setName("Computer 1");
       player1.setIsComputer(true);
       player2.setName("Computer 2");
