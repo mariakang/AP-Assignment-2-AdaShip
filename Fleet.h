@@ -32,10 +32,6 @@ class Fleet {
       return boats_[index];
     }
 
-    void remove(int index);
-    
-    void removeBoat(Boat& boat);
-
     Fleet& operator=(const Fleet& rhs) {
       if (this != &rhs) {
         size_ = rhs.size_;

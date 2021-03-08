@@ -1,7 +1,5 @@
 #pragma once
 
-using namespace std;
-
 class Coordinate {
   private:
     int row_;
