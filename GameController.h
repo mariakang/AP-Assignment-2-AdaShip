@@ -22,11 +22,15 @@ class GameController {
     int mines_;
     bool showComputerBoard_;
     bool useTargetingAlgorithm_;
+    int pause_;
     CoordinateConverter converter_;
     Fleet fleet_;
 
     int randomNumber(int upperBound);
     void calculateProbabilities(Player& player);
+    void removePause() {
+      pause_ = 0;
+    }
 
   public:
     GameController(Config config);

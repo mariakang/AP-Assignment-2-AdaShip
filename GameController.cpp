@@ -30,6 +30,7 @@ GameController::GameController(Config config) {
     mines_ = rows_;
   }
   showComputerBoard_ = true;
+  pause_ = PAUSE_IN_SECONDS;
   CoordinateConverter converter(config);
   converter_ = converter;
   fleet_ = config.fleet().copy();
@@ -1000,8 +1001,8 @@ void GameController::launchGame(int numberOfHumanPlayers, bool salvoMode, bool m
   takeTurns(player1, player2, salvoMode);
 }
 
-/** Blocks further execution for PAUSE_IN_SECONDS seconds. */
+/** Blocks further execution for pause_ seconds. */
 void GameController::pause() {
   // convert seconds to milliseconds
-  this_thread::sleep_for(chrono::milliseconds(PAUSE_IN_SECONDS * 1000));
+  this_thread::sleep_for(chrono::milliseconds(pause_ * 1000));
 }
