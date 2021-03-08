@@ -6,6 +6,7 @@ using namespace std;
 
 #include "Board.h"
 #include "Boat.h"
+#include "CoordinateStack.h"
 #include "Fleet.h"
 
 class Player {
@@ -16,6 +17,7 @@ class Player {
     int shotsTaken_;
     Fleet fleet_;
     Board board_;
+    CoordinateStack targets_;
 
   public:
     Player(string name, Fleet fleet, Board board) {
@@ -69,5 +71,9 @@ class Player {
 
     void incrementShotsTaken() {
       shotsTaken_++;
+    }
+
+    void addTarget(Coordinate coordinate) {
+      targets_.push(coordinate);
     }
 };
