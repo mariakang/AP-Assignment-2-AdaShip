@@ -62,11 +62,13 @@ bool GameController::torpedo(Player& player, Coordinate c) {
   // get the board and board square
   Board& board = player.board();
   BoardSquare& square = board.getSquare(c);
+  cout << converter_.coordinateToString(c);
   // if the square has already been torpedoed, return false
   if (square.torpedoed()) {
+    cout << " has already been torpedoed.\n";
     return false;
   }
-  cout << converter_.coordinateToString(c) << "... ";
+  cout << "... ";
   // update the square to be torpedoed
   square.setTorpedoed(true);
   // this coordinate should be removed from the number of
@@ -116,15 +118,15 @@ bool GameController::torpedo(Player& player, Coordinate c) {
     }
   }
   // if the square contains a mine, explode the surrounding
-  // squares (if a square has already been torpedoed, nothing
-  // will happen, so it doesn't matter that the loop includes
-  // the current square again)
+  // squares
   if (square.hasMine()) {
     cout << "Mine!\n";
     for (int i = c.row() - 1; i <= c.row() + 1; i++) {
       for (int j = c.column() - 1; j <= c.column() + 1; j++) {
-        Coordinate neighbour(i, j);
-        torpedo(player, neighbour);
+        if (i != c.row() || j != c.column()) {
+          Coordinate neighbour(i, j);
+          torpedo(player, neighbour);
+        }
       }
     }
   }
@@ -254,11 +256,12 @@ bool GameController::torpedoCalculated(Player& player) {
   // get the player's target stack
   CoordinateStack& targets = player.targets();
   // while the stack is non-empty, remove each target until a suitable candidate
-  // has been found (at which point we can torpedo it and return true)
+  // has been found
   while (targets.size() > 0) {
     Coordinate target = targets.pop();
-    if (torpedo(player, target)) {
-      return true;
+    // if the target hasn't already been torpedoed, torpedo it
+    if (!player.board().getSquare(target).torpedoed()) {
+      return torpedo(player, target);
     }
   }
   // if we've got to this point, it means the target stack is empty, so we need to
@@ -741,117 +744,131 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
   } else {
     pause();
   }
-  // calculate the number of shots allowed
+  // calculate the number of shots allowed; if in salvo mode, this is the number of
+  // surviving boats, otherwise it's 1
   int allowedShots = 1;
   if (salvoMode) {
     allowedShots = player.survivingBoats();
   }
-
-  // check whether the player is the computer
-  bool isComputer = player.isComputer();
-
-  // print the player's board and target board (unless disabled)
+  
+  // intitialise a printer to print the boards
   BoardPrinter printer;
-  if (!isComputer || showComputerBoard_) {
+
+  // check whether the player is the computer; if so, don't ask for user input
+  if (player.isComputer()) {
+    // print the computer's boat and target boards, unless they should be hidden
+    if (showComputerBoard_) {
+      cout << "\nBoats:\n";
+      printer.printBoard(player);
+      pause();
+      cout << "Targets:\n";
+      printer.printBoardOpponentView(opponent);
+      pause();  
+    }
+    // fire the given number of torpedoes
+    for (int i = 0; i < allowedShots; i++) {
+      // if the difficulty level was set to 'hard', use the targeting algorithm
+      if (useTargetingAlgorithm_) {
+        torpedoCalculated(opponent);
+      // otherwise, pick a target randomly
+      } else {
+        torpedoRandom(opponent);
+      }
+      postTorpedoRoutine(player, opponent);
+      // check to see if we have a winner
+      if (opponent.survivingBoats() == 0) {
+        // if so, run the gameEnd function
+        return gameEnd(player);
+      }
+    }
+
+  // if the player is human, print their boards and ask for target(s)
+  } else {
     cout << "\nBoats:\n";
     printer.printBoard(player);
     pause();
     cout << "Targets:\n";
     printer.printBoardOpponentView(opponent);
-    pause();  
-  }
+    pause(); 
 
-  // if the player is the computer, we will use autoFire mode, and
-  // we will set validSelection to true, so that the user won't be
-  // asked for input
-  bool validSelection = isComputer;
-  bool autoFire = isComputer;
-  
-  // initialise an array to store input
-  string input = "";
-  string targets[allowedShots];
-  int targetsSize = 0;
-  // prompt the user to enter target(s) until a valid selection has been made
-  // (if fewer than the allowed number of targets are entered, fewer shots
-  // will be taken)
-  while (!validSelection) {
-    if (allowedShots > 1) {
-      cout << "\nEnter up to " << to_string(allowedShots) << " targets (or press 'Enter' to auto-fire): ";
-    } else {
-      cout << "\nEnter a target (or press 'Enter' to auto-fire): ";
-    }
-    getline(cin, input);
-    // if the input string is empty, set autoFire and validSelection to true,
-    // and exit the while loop
-    if (input.length() == 0) {
-      autoFire = true;
-      validSelection = true;
-      break;
-    } else {
-      // iterate over the input string, adding targets to the array
-      int arrayIndex = 0;
-      string token = "";
-      for (int i = 0; i < input.length(); i++) {
-        // if the character is a space, add the stored token to the array
-        if (input[i] == ' ') {
-          targets[arrayIndex] = token;
-          // reset token
-          token = "";
-          // increment arrayIndex
-          arrayIndex++;
-          // if we've reached the number of required targets, ignore the
-          // rest of the string
-          if (arrayIndex >= allowedShots) {
-            break;
-          }
-        // if the character isn't a space, add it to the token
-        } else {
-          token += input[i];
-        }
-      }
-      // add the last token to the array
-      if (arrayIndex < allowedShots) {
-        targets[arrayIndex] = token;
-        arrayIndex++;
-      }
-      // check for any invalid targets
-      validSelection = true;
-      for (int i = 0; i < allowedShots && i < arrayIndex; i++) {
-        if (!isValidCoordinate(converter_.getCoordinate(targets[i]))) {
-          cout << "'" << targets[i] << "' is not a valid target.\n";
-          validSelection = false;
-        }
-      }
-      // if all targets are valid, update targetsSize
-      if (validSelection) {
-        targetsSize = arrayIndex;
-      }
-    }
-  }
-  cout << "\n";
-  // for each allowed shot, fire a torpedo at the opponent's
-  // board; if fewer than the allowed number of targets were
-  // specified, then only fire a torpedo at the specified
-  // targets
-  for (int i = 0; i < allowedShots; i++) {
-    // make sure we have a target
-    if (autoFire || i < targetsSize) {
-      // if in autoFire mode, pick a target randomly
-      if (autoFire) {
-        torpedoRandom(opponent);
-      // if not in autoFire mode, get the coordinate of the target
+    // keep asking for targets until a valid selection has been made 
+    bool validSelection = false;
+    // initialise an array to store input
+    string input = "";
+    string targets[allowedShots];
+    // prompt the user to enter target(s) until a valid selection has been made
+    // (if fewer than the allowed number of targets are entered, fewer shots
+    // will be taken)
+    while (!validSelection) {
+      if (allowedShots > 1) {
+        cout << "\nEnter up to " << to_string(allowedShots) << " targets (or press 'Enter' to auto-fire): ";
       } else {
-        Coordinate c = converter_.getCoordinate(targets[i]);
-        torpedo(opponent, c);
+        cout << "\nEnter a target (or press 'Enter' to auto-fire): ";
       }
-      // print the target board
-      printer.printBoardOpponentView(opponent);
-      player.incrementShotsTaken();
-      pause();
-      // check to see if we have a winner
-      if (opponent.survivingBoats() == 0) {
-        // if so, run the gameEnd function
-        return gameEnd(player);
+      getline(cin, input);
+      // if the input string is empty, set validSelection to true, fire randomly,
+      // and exit the while loop
+      if (input.length() == 0) {
+        validSelection = true;
+        cout << "\n";
+        for (int i = 0; i < allowedShots; i++) {
+          torpedoRandom(opponent);
+          postTorpedoRoutine(player, opponent);
+          // check to see if we have a winner
+          if (opponent.survivingBoats() == 0) {
+          // if so, run the gameEnd function
+            return gameEnd(player);
+          }
+        }
+        break;
+      } else {
+        // iterate over the input string, adding targets to the array
+        int arrayIndex = 0;
+        string token = "";
+        for (int i = 0; i < input.length(); i++) {
+          // if the character is a space, add the stored token to the array
+          if (input[i] == ' ') {
+            targets[arrayIndex] = token;
+            // reset token
+            token = "";
+            // increment arrayIndex
+            arrayIndex++;
+            // if we've reached the number of required targets, ignore the
+            // rest of the string
+            if (arrayIndex >= allowedShots) {
+              break;
+            }
+          // if the character isn't a space, add it to the token
+          } else {
+            token += input[i];
+          }
+        }
+        // add the last token to the array
+        if (arrayIndex < allowedShots) {
+          targets[arrayIndex] = token;
+          arrayIndex++;
+        }
+        // check for any invalid targets (already torpedoed targets still count)
+        validSelection = true;
+        for (int i = 0; i < allowedShots && i < arrayIndex; i++) {
+          if (!isValidCoordinate(converter_.getCoordinate(targets[i]))) {
+            cout << "'" << targets[i] << "' is not a valid target.\n";
+            validSelection = false;
+          }
+        }
+        // if all targets are valid, fire a torpedo at each one
+        if (validSelection) {
+          cout << "\n";
+          for (int i = 0; i < arrayIndex; i++) {
+            torpedo(opponent, converter_.getCoordinate(targets[i]));
+            postTorpedoRoutine(player, opponent);
+            // check to see if we have a winner
+            if (opponent.survivingBoats() == 0) {
+            // if so, run the gameEnd function
+              return gameEnd(player);
+            }
+          }
+        }
       }
     }
   }
@@ -859,6 +876,18 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
   promptToContinue();
   // now it's the opponent's turn
   return takeTurns(opponent, player, salvoMode);
+}
+
+/** Runs immediately after 'player' has fired a torpedo at 'opponent'. */
+void GameController::postTorpedoRoutine(Player& player, Player& opponent) {
+  // update the number of shots taken, and pause briefly
+  player.incrementShotsTaken();
+  // print the player's target board
+  if (!player.isComputer() || showComputerBoard_) {
+    BoardPrinter printer;
+    printer.printBoardOpponentView(opponent);
+    pause();
+  }
 }
 
 /** Runs when the given player has won. */

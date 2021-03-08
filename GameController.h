@@ -21,6 +21,7 @@ class GameController {
     int columns_;
     int mines_;
     bool showComputerBoard_;
+    bool useTargetingAlgorithm_;
     CoordinateConverter converter_;
     Fleet fleet_;
 
@@ -60,6 +61,8 @@ class GameController {
     bool gameSetup(Player& player, bool minesMode);
     
     bool takeTurns(Player& player, Player& opponent, bool salvoMode);
+
+    void postTorpedoRoutine(Player& player, Player& opponent);
 
     bool gameEnd(Player& player);
 
