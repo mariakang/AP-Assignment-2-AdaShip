@@ -79,8 +79,9 @@ Coordinate CoordinateConverter::getCoordinate(string s) {
     numeric += s[index];
     index++;
   }
-  // if we haven't reached the end of the string, return (0, 0)
-  if (index < s.length()) {
+  // if we haven't reached the end of the string, or the numeric part is
+  // empty, return (0, 0)
+  if (index < s.length() || numeric.length() == 0) {
     return coordinate;
   }
   // find the row corresponding to the numeric part of the string

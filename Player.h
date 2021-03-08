@@ -61,6 +61,10 @@ class Player {
       return board_;
     }
 
+    CoordinateStack& targets() {
+      return targets_;
+    }
+
     Boat& getBoat(int boatId) {
       return fleet_.boatAtIndex(boatId);
     }

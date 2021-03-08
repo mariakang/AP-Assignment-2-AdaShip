@@ -76,20 +76,49 @@ bool GameController::torpedo(Player& player, Coordinate c) {
   if (square.boatId() < 0) {
     cout << "Miss\n";
   // if it does contain a boat, get the boat and update its
-  // damage; if it's been sunk, update the number of
-  // surviving boats the player has left 
+  // damage 
   } else {
     cout << "Hit!\n";
     Boat& boat = player.getBoat(square.boatId());
     boat.hit();
+    // if it's been sunk, update the number of surviving
+    // boats the player has left
     if (boat.isSunk()) {
       player.decrementSurvivingBoats();
+    }
+    // add the four adjacent coordinates to the player's
+    // target stack (to be used by their opponent's targeting
+    // algorithm); ignore any coordinates which fall outside
+    // the board, or have already been torpedoed
+    if (c.row() > 1) {
+      Coordinate above(c.row() - 1, c.column());
+      if (!board.getSquare(above).torpedoed()) {
+        player.addTarget(above);
+      }
+    }
+    if (c.row() < board.rows()) {
+      Coordinate below(c.row() + 1, c.column());
+      if (!board.getSquare(below).torpedoed()) {
+        player.addTarget(below);
+      }
+    }
+    if (c.column() > 1) {
+      Coordinate left(c.row(), c.column() - 1);
+      if (!board.getSquare(left).torpedoed()) {
+        player.addTarget(left);
+      }
+    }
+    if (c.column() < board.columns()) {
+      Coordinate right(c.row(), c.column() + 1);
+      if (!board.getSquare(right).torpedoed()) {
+        player.addTarget(right);
+      }
     }
   }
   // if the square contains a mine, explode the surrounding
   // squares (if a square has already been torpedoed, nothing
   // will happen, so it doesn't matter that the loop includes
-  // current square again)
+  // the current square again)
   if (square.hasMine()) {
     cout << "Mine!\n";
     for (int i = c.row() - 1; i <= c.row() + 1; i++) {
@@ -130,8 +159,8 @@ bool GameController::torpedoRandom(Player& player) {
  * Calculates and updates the relative probabilities of each square of the
  * given player's board being occupied.
  *
- * If the player's opponent is the computer, then these probabilities may be
- * used by the computer's targeting algorithm.
+ * These probabilities may be used by the player's opponent when invoking the
+ * targeting algorithm.
  *
  * Note: This algorithm is 'fair' in the sense that it only uses information
  * which a human player would also have access to, if the roles were reversed.   
@@ -222,7 +251,37 @@ void GameController::calculateProbabilities(Player& player) {
  * Returns whether or not the action completed successfully.
  */
 bool GameController::torpedoCalculated(Player& player) {
+  // get the player's target stack
+  CoordinateStack& targets = player.targets();
+  // while the stack is non-empty, remove each target until a suitable candidate
+  // has been found (at which point we can torpedo it and return true)
+  while (targets.size() > 0) {
+    Coordinate target = targets.pop();
+    if (torpedo(player, target)) {
+      return true;
+    }
+  }
+  // if we've got to this point, it means the target stack is empty, so we need to
+  // calculate the relative probabilities of each square
+  calculateProbabilities(player);
 
+  // iterate over the player's board, holding on to the highest probability, and
+  // the first coordinate which has it
+  Coordinate target;
+  int highestProbability = 0;
+  Board& board = player.board();
+  for (int i = 1; i <= board.rows(); i++) {
+    for (int j = 1; j <= board.columns(); j++) {
+      Coordinate cij(i, j);
+      int probability = board.getSquare(cij).probabilityDensity();
+      if (probability > highestProbability) {
+        highestProbability = probability;
+        target = cij;
+      }
+    }
+  }
+  // fire a torpedo at the calculated target
+  return torpedo(player, target); 
 }
 
 /** 
