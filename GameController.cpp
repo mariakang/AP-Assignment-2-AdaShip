@@ -12,6 +12,7 @@ using namespace std;
 #include "Config.h"
 #include "Coordinate.h"
 #include "CoordinateConverter.h"
+#include "CoordinateStack.h"
 #include "GameController.h"
 #include "Player.h"
 
@@ -474,7 +475,6 @@ bool GameController::removeBoat(Player& player, Boat& boat) {
       }
     }
   }
-
   return true;
 }
 
@@ -494,10 +494,9 @@ bool GameController::placeBoatRandom(Player& player, int boatId) {
   int len = player.getBoat(boatId).length();
   // get the player's board
   Board& board = player.board();
-  // create an array to store the possible starting coordinates,
-  // keeping track of the number of items added
-  Coordinate possibleCoords[rows_ * columns_]; 
-  int possibleCoordsSize = 0;
+  // create an array to store the possible starting coordinates
+  // (CoordinateStack provides index access)
+  CoordinateStack possibleCoords; 
   // iterate over the board squares
   for (int i = 1; i < rows_; i++) {
     for (int j = 1; j < columns_; j++) {
@@ -509,14 +508,13 @@ bool GameController::placeBoatRandom(Player& player, int boatId) {
       // 'possibleCoords' and update the size
       if ((vertical && squareij.maxBoatLengthVertical() >= len)
           || (!vertical && squareij.maxBoatLengthHorizontal() >= len)) {
-        possibleCoords[possibleCoordsSize] = cij;
-        possibleCoordsSize++;
+        possibleCoords.push(cij);
       }
     }
   }
   // randomly select a coordinate from the array
-  int randomIndex = randomNumber(possibleCoordsSize) - 1;
-  Coordinate c = possibleCoords[randomIndex];
+  int randomIndex = randomNumber(possibleCoords.size()) - 1;
+  Coordinate c = possibleCoords.coordAtIndex(randomIndex);
 
   // place the boat at this coordinate using the chosen orientation
   return placeBoat(player, boatId, c, vertical);
