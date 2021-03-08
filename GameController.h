@@ -25,6 +25,7 @@ class GameController {
     Fleet fleet_;
 
     int randomNumber(int upperBound);
+    void calculateProbabilities(Player& player);
 
   public:
     GameController(Config config);
@@ -43,6 +44,8 @@ class GameController {
     bool torpedo(Player& player, Coordinate c);
 
     bool torpedoRandom(Player& player);
+
+    bool torpedoCalculated(Player& player);
 
     bool placeBoat(Player& player, int boatId, Coordinate c, bool vertical);
 

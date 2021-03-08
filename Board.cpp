@@ -29,3 +29,11 @@ void Board::initialiseSquares() {
     }
   }
 }
+
+void Board::clearProbabilities() {
+  for (int i = 0; i < rows_; i++) {
+    for (int j = 0; j < columns_ ; j++) {
+      board_[i][j].resetProbability();
+    }
+  }
+}

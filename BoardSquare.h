@@ -9,6 +9,7 @@ class BoardSquare {
     bool hasMine_;
     int maxBoatLengthVertical_;
     int maxBoatLengthHorizontal_;
+    int probabilityDensity_;
 
   public:
     BoardSquare() {
@@ -17,6 +18,7 @@ class BoardSquare {
       hasMine_ = false;
       maxBoatLengthVertical_ = 0;
       maxBoatLengthHorizontal_ = 0;
+      probabilityDensity_ = 0;
     }
     int boatId() {
       return boatId_;
@@ -48,6 +50,18 @@ class BoardSquare {
     void setMaxBoatLengthHorizontal(int maxBoatLengthHorizontal) {
       maxBoatLengthHorizontal_ = maxBoatLengthHorizontal;
     }
+    int probabilityDensity() {
+      return probabilityDensity_;
+    }
+    void resetProbability() {
+      probabilityDensity_ = 0;
+    }
+    void incrementProbability() {
+      probabilityDensity_++;
+    }
+    bool isMiss() {
+      return torpedoed_ && boatId_ < 0;
+    }
     BoardSquare& operator=(const BoardSquare& rhs) {
       if (this != &rhs) {
         boatId_ = rhs.boatId_;
@@ -55,6 +69,7 @@ class BoardSquare {
         hasMine_ = rhs.hasMine_;
         maxBoatLengthVertical_ = rhs.maxBoatLengthVertical_;
         maxBoatLengthHorizontal_ = rhs.maxBoatLengthHorizontal_;
+        probabilityDensity_ = rhs.probabilityDensity_;
       }
       return (*this);
     }

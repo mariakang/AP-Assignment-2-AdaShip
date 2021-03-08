@@ -49,6 +49,8 @@ class Board {
       remainingTargets_--;
     }
 
+    void clearProbabilities();
+
     Board& operator=(const Board& rhs) {
       if (this != &rhs) {
         rows_ = rhs.rows_;
