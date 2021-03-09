@@ -6,7 +6,6 @@
 
 using namespace std;
 
-#include "Config.h"
 #include "Coordinate.h"
 
 class CoordinateConverter {
@@ -21,11 +20,13 @@ class CoordinateConverter {
 
     CoordinateConverter(int rows, int columns);
 
-    CoordinateConverter(Config config);
-
     string columnToString(int column);
 
     string coordinateToString(Coordinate c);
 
     Coordinate getCoordinate(string s);
+
+    bool isValidCoordinate(Coordinate c);
+
+    bool isValidCoordinateString(string s);
 };

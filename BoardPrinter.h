@@ -18,11 +18,7 @@ class BoardPrinter {
   public:
     BoardPrinter() {}
 
-    void printBoard(Player player, bool setupMode);
-
-    void printBoard(Player player) {
-      printBoard(player, /* setupMode= */ false);
-    }
+    void printBoard(Player player, bool setupMode = false);
 
     void printBoardOpponentView(Player player);
 

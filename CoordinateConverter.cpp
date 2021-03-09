@@ -1,11 +1,9 @@
 #include <map>
 #include <iterator>
 #include <string>
-#include <time.h>
 
 using namespace std;
 
-#include "Config.h"
 #include "Coordinate.h"
 #include "CoordinateConverter.h"
 
@@ -14,15 +12,6 @@ CoordinateConverter::CoordinateConverter(int rows, int columns) {
   // set number of rows and columns
   rows_ = rows;
   columns_ = rows;
-  // populate an 'alpha to column number' lookup map
-  initialiseLookup();
-}
-
-/** Constructor function for CoordinateConverter (used by GameController). */
-CoordinateConverter::CoordinateConverter(Config config) {
-  // set number of rows and columns
-  rows_ = config.rows();
-  columns_ = config.columns();
   // populate an 'alpha to column number' lookup map
   initialiseLookup();
 }
@@ -96,4 +85,16 @@ Coordinate CoordinateConverter::getCoordinate(string s) {
   coordinate.setRow(row);
   coordinate.setColumn(column);
   return coordinate;
+}
+
+/** Returns whether or not the given Coordinate is valid. */
+bool CoordinateConverter::isValidCoordinate(Coordinate c) {
+  int row = c.row();
+  int column = c.column();
+  return (row > 0 && row <= rows_ && column > 0 && column <= columns_);
+}
+
+/** Returns whether or not the given string is a valid Coordinate. */
+bool CoordinateConverter::isValidCoordinateString(string s) {
+  return isValidCoordinate(getCoordinate(s));
 }

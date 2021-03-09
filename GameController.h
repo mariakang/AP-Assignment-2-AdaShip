@@ -13,8 +13,6 @@ using namespace std;
 #include "CoordinateConverter.h"
 #include "Player.h"
 
-#define NUMBER_OF_PLAYERS 2
-
 class GameController {
   private:
     int rows_;
@@ -25,39 +23,19 @@ class GameController {
     Fleet fleet_;
 
     int randomNumber(int upperBound);
-    void calculateProbabilities(Player& player);
 
   public:
     GameController(Config config);
 
-    /** Returns whether or not the given Coordinate is valid. */
-    bool isValidCoordinate(Coordinate coordinate) {
-      int row = coordinate.row();
-      int column = coordinate.column();
-      return (row > 0 && row <= rows_ && column > 0 && column <= columns_);
-    }
+    void menu();
 
-    CoordinateConverter converter() {
-      return converter_;
-    }
+    void launchGame(int numberOfHumanPlayers, bool salvoMode, bool minesMode);
 
-    bool torpedo(Player& player, Coordinate c, bool outputToConsole = true);
-
-    bool torpedoRandom(Player& player, bool outputToConsole = true);
-
-    bool torpedoCalculated(Player& player, bool outputToConsole = true);
-
-    bool placeBoat(Player& player, int boatId, Coordinate c, bool vertical);
-
-    bool removeBoat(Player& player, Boat& boat);
-
-    bool placeBoatRandom(Player& player, int boatId);
-
-    bool placeRemainingBoats(Player& player);
-
-    bool placeMines(Player& player);
+    void launchExperiment();
 
     bool gameSetup(Player& player, bool minesMode);
+
+    bool placeMines(Player& player);
     
     bool takeTurns(Player& player, Player& opponent, bool salvoMode);
 
@@ -65,15 +43,9 @@ class GameController {
 
     bool gameEnd(Player& player, Player& opponent);
 
-    void promptToContinue();
-
     void pause();
 
+    void promptToContinue();
+
     void quit();
-
-    void menu();
-
-    void launchGame(int numberOfHumanPlayers, bool salvoMode, bool minesMode);
-
-    void launchExperiment();
 };
