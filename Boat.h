@@ -65,6 +65,9 @@ class Boat {
     int damage() {
       return damage_;
     }
+    void resetDamage() {
+      damage_ = 0;
+    }
     bool isPlaced() {
       return !start_.isOrigin();
     }

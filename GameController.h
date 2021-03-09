@@ -21,8 +21,6 @@ class GameController {
     int columns_;
     int mines_;
     bool showComputerBoard_;
-    int pause_;
-    bool prompt_;
     CoordinateConverter converter_;
     Fleet fleet_;
 
@@ -43,11 +41,11 @@ class GameController {
       return converter_;
     }
 
-    bool torpedo(Player& player, Coordinate c);
+    bool torpedo(Player& player, Coordinate c, bool outputToConsole = true);
 
-    bool torpedoRandom(Player& player);
+    bool torpedoRandom(Player& player, bool outputToConsole = true);
 
-    bool torpedoCalculated(Player& player);
+    bool torpedoCalculated(Player& player, bool outputToConsole = true);
 
     bool placeBoat(Player& player, int boatId, Coordinate c, bool vertical);
 
@@ -76,4 +74,6 @@ class GameController {
     void menu();
 
     void launchGame(int numberOfHumanPlayers, bool salvoMode, bool minesMode);
+
+    void launchExperiment();
 };

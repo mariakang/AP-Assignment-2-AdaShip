@@ -30,8 +30,6 @@ GameController::GameController(Config config) {
     mines_ = rows_;
   }
   showComputerBoard_ = true;
-  pause_ = PAUSE_IN_SECONDS;
-  prompt_ = true;
   CoordinateConverter converter(config);
   converter_ = converter;
   fleet_ = config.fleet().copy();
@@ -54,7 +52,7 @@ int GameController::randomNumber(int upperBound) {
  *
  * Returns whether or not the action completed successfully.
  */
-bool GameController::torpedo(Player& player, Coordinate c) {
+bool GameController::torpedo(Player& player, Coordinate c, bool outputToConsole) {
   // coordinates supplied by users will have already been checked,
   // but if the torpedo request came from a mine, the coordinate
   // could lie outside the board boundaries
@@ -64,13 +62,19 @@ bool GameController::torpedo(Player& player, Coordinate c) {
   // get the board and board square
   Board& board = player.board();
   BoardSquare& square = board.getSquare(c);
-  cout << converter_.coordinateToString(c);
+  if (outputToConsole) {
+    cout << converter_.coordinateToString(c);
+  }
   // if the square has already been torpedoed, return false
   if (square.torpedoed()) {
-    cout << " has already been torpedoed.\n";
+    if (outputToConsole) {
+      cout << " has already been torpedoed.\n";
+    }
     return false;
   }
-  cout << "... ";
+  if (outputToConsole) {
+    cout << "... ";
+  }
   // update the square to be torpedoed
   square.setTorpedoed(true);
   // this coordinate should be removed from the number of
@@ -78,11 +82,15 @@ bool GameController::torpedo(Player& player, Coordinate c) {
   board.decrementRemainingTargets();
   // if the square doesn't contain a boat, it's a miss
   if (square.boatId() < 0) {
-    cout << "Miss\n";
+    if (outputToConsole) {
+      cout << "Miss\n";
+    }
   // if it does contain a boat, get the boat and update its
   // damage 
   } else {
-    cout << "Hit!\n";
+    if (outputToConsole) {
+      cout << "Hit!\n";
+    }
     Boat& boat = player.getBoat(square.boatId());
     boat.hit();
     // if it's been sunk, update the number of surviving
@@ -122,7 +130,9 @@ bool GameController::torpedo(Player& player, Coordinate c) {
   // if the square contains a mine, explode the surrounding
   // squares
   if (square.hasMine()) {
-    cout << "Mine!\n";
+    if (outputToConsole) {
+      cout << "Mine!\n";
+    }
     for (int i = c.row() - 1; i <= c.row() + 1; i++) {
       for (int j = c.column() - 1; j <= c.column() + 1; j++) {
         if (i != c.row() || j != c.column()) {
@@ -132,7 +142,9 @@ bool GameController::torpedo(Player& player, Coordinate c) {
       }
     }
   }
-  pause();
+  if (outputToConsole) {
+    pause();
+  }
   return true;
 }
 
@@ -141,7 +153,7 @@ bool GameController::torpedo(Player& player, Coordinate c) {
  *
  * Returns whether or not the action completed successfully.
  */
-bool GameController::torpedoRandom(Player& player) {
+bool GameController::torpedoRandom(Player& player, bool outputToConsole) {
   Board& board = player.board();
   int target = randomNumber(board.remainingTargets());
   int counter = 0;
@@ -151,7 +163,7 @@ bool GameController::torpedoRandom(Player& player) {
       if (!board.getSquare(c).torpedoed()) {
         counter++;
         if (counter == target) {
-          return torpedo(player, c);
+          return torpedo(player, c, outputToConsole);
         }
       }
     }
@@ -185,57 +197,62 @@ void GameController::calculateProbabilities(Player& player) {
     for (int j = 1; j <= board.columns(); j++) {
       Coordinate cij(i, j);
       BoardSquare& squareij = board.getSquare(cij);
-      // if the square has already been torpedoed, skip it (we don't
-      // want to target it again)
-      if (squareij.torpedoed()) {
-        continue;
-      }
-      // iterate over the fleet
-      for (int k = 0; k < fleetSize; k++) {
-        int boatLength = boatLengths[k];
-        // check to see if a boat of this length could be placed here
-        // vertically; if it doesn't fit on the board, move on
-        if (board.rows() - i + 1 >= boatLength) {
-          bool canPlaceV = true;
-          // moving downwards until the end of the boat, if we encounter
-          // a 'miss', then we can't place the boat here
-          for (int l = 1; l < boatLength; l++) {
-            Coordinate cilj(i + l, j);
-            BoardSquare& squareilj = board.getSquare(cilj);
-            if (squareilj.isMiss()) {
-              canPlaceV = false;
-              break;
-            }
-          }
-          // if we can place the boat here, increment the probabilities
-          // of each occupied square
-          if (canPlaceV) {
-            for (int l = 0; l < boatLength; l++) {
+      // if the square has already been missed, skip it (we can't place any
+      // boat here)
+      if (!squareij.isMiss()) {
+        // iterate over the fleet
+        for (int k = 0; k < fleetSize; k++) {
+          int boatLength = boatLengths[k];
+          // check to see if a boat of this length could be placed here
+          // vertically; if it doesn't fit on the board, move on
+          if (board.rows() - i + 1 >= boatLength) {
+            bool canPlaceV = true;
+            // moving downwards until the end of the boat, if we encounter
+            // a 'miss', then we can't place the boat here
+            for (int l = 1; l < boatLength; l++) {
               Coordinate cilj(i + l, j);
-              board.getSquare(cilj).incrementProbability();
+              BoardSquare& squareilj = board.getSquare(cilj);
+              if (squareilj.isMiss()) {
+                canPlaceV = false;
+                break;
+              }
+            }
+            // if we can place the boat here, increment the probabilities
+            // of each occupied square (unless already torpedoed)
+            if (canPlaceV) {
+              for (int l = 0; l < boatLength; l++) {
+                Coordinate cilj(i + l, j);
+                BoardSquare& squareilj = board.getSquare(cilj);
+                if (!squareilj.torpedoed()) {
+                  squareilj.incrementProbability();
+                }
+              }
             }
           }
-        }
-        // check to see if a boat of this length could be placed here
-        // horizontally; if it doesn't fit on the board, move on
-        if (board.columns() - j + 1 >= boatLength) {
-          bool canPlaceH = true;
-          // moving right until the end of the boat, if we encounter
-          // a 'miss', then we can't place the boat here
-          for (int l = 1; l < boatLength; l++) {
-            Coordinate cijl(i, j + l);
-            BoardSquare& squareijl = board.getSquare(cijl);
-            if (squareijl.isMiss()) {
-              canPlaceH = false;
-              break;
-            }
-          }
-          // if we can place the boat here, increment the probabilities
-          // of each occupied square
-          if (canPlaceH) {
-            for (int l = 0; l < boatLength; l++) {
+          // check to see if a boat of this length could be placed here
+          // horizontally; if it doesn't fit on the board, move on
+          if (board.columns() - j + 1 >= boatLength) {
+            bool canPlaceH = true;
+            // moving right until the end of the boat, if we encounter
+            // a 'miss', then we can't place the boat here
+            for (int l = 1; l < boatLength; l++) {
               Coordinate cijl(i, j + l);
-              board.getSquare(cijl).incrementProbability();
+              BoardSquare& squareijl = board.getSquare(cijl);
+              if (squareijl.isMiss()) {
+                canPlaceH = false;
+                break;
+              }
+            }
+            // if we can place the boat here, increment the probabilities
+            // of each occupied square (unless already torpedoed)
+            if (canPlaceH) {
+              for (int l = 0; l < boatLength; l++) {
+                Coordinate cijl(i, j + l);
+                BoardSquare& squareijl = board.getSquare(cijl);
+                if (!squareijl.torpedoed()) {
+                  squareijl.incrementProbability();
+                }
+              }
             }
           }
         }
@@ -254,7 +271,7 @@ void GameController::calculateProbabilities(Player& player) {
  *
  * Returns whether or not the action completed successfully.
  */
-bool GameController::torpedoCalculated(Player& player) {
+bool GameController::torpedoCalculated(Player& player, bool outputToConsole) {
   // get the player's target stack
   CoordinateStack& targets = player.targets();
   // while the stack is non-empty, remove each target until a suitable candidate
@@ -263,7 +280,7 @@ bool GameController::torpedoCalculated(Player& player) {
     Coordinate target = targets.pop();
     // if the target hasn't already been torpedoed, torpedo it
     if (!player.board().getSquare(target).torpedoed()) {
-      return torpedo(player, target);
+      return torpedo(player, target, outputToConsole);
     }
   }
   // if we've got to this point, it means the target stack is empty, so we need to
@@ -286,7 +303,7 @@ bool GameController::torpedoCalculated(Player& player) {
     }
   }
   // fire a torpedo at the calculated target
-  return torpedo(player, target); 
+  return torpedo(player, target, outputToConsole); 
 }
 
 /** 
@@ -916,19 +933,16 @@ bool GameController::gameEnd(Player& player, Player& opponent) {
 
 /** Prompts the user to press return before continuing. */
 void GameController::promptToContinue() {
-  // the 'prompt_' field allows us to switch this off for automated experiments
-  if (prompt_) {
-    // ask the user what they'd like to do
-    string response = "";
-    cout << "\nPress 'Enter' to continue... ('r' to return to the main menu or 'q' to quit): ";
-    getline(cin, response);
-    // if the response begins with 'q' (or 'Q') then exit the program
-    if (tolower(response[0]) == 'q') {
-      quit();
-    // if the response begins with 'r' (or 'R') then return to the main menu
-    } else if (tolower(response[0]) == 'r') {
-      menu();
-    }
+  // ask the user what they'd like to do
+  string response = "";
+  cout << "\nPress 'Enter' to continue... ('r' to return to the main menu or 'q' to quit): ";
+  getline(cin, response);
+  // if the response begins with 'q' (or 'Q') then exit the program
+  if (tolower(response[0]) == 'q') {
+    quit();
+  // if the response begins with 'r' (or 'R') then return to the main menu
+  } else if (tolower(response[0]) == 'r') {
+    menu();
   }
 }
 
@@ -961,7 +975,7 @@ void GameController::menu() {
     cout << "\t6 - Two player game (hidden mines)\n";
     cout << "\t7 - Computer v computer (hidden mines)\n";
     cout << "\t8 - One player v computer (salvo mode with hidden mines)\n";
-    cout << "\t9 - Two player game (salvo mode with hidden mines)\n";
+    cout << "\t9 - Run experiment (random selection v targeting algorithm)\n";
     cout << "\tq - Quit\n";
     cout << "\nPlease select an option: ";
     getline(cin, input);
@@ -969,16 +983,16 @@ void GameController::menu() {
     if (input.length() == 1) {
       char choice = input[0];
       switch (choice) {
-        case '1': launchGame(/* players= */ 1, /* salvoMode= */ false, /* minesMode= */ false);
-        case '2': launchGame(/* players= */ 2, /* salvoMode= */ false, /* minesMode= */ false);
-        case '3': launchGame(/* players= */ 1, /* salvoMode= */ true, /* minesMode= */ false);
-        case '4': launchGame(/* players= */ 2, /* salvoMode= */ true, /* minesMode= */ false);
-        case '5': launchGame(/* players= */ 1, /* salvoMode= */ false, /* minesMode= */ true);
-        case '6': launchGame(/* players= */ 2, /* salvoMode= */ false, /* minesMode= */ true);
-        case '7': launchGame(/* players= */ 0, /* salvoMode= */ false, /* minesMode= */ true);
-        case '8': launchGame(/* players= */ 1, /* salvoMode= */ true, /* minesMode= */ true);
-        case '9': launchGame(/* players= */ 2, /* salvoMode= */ true, /* minesMode= */ true);
-        case 'q': quit();
+        case '1': launchGame(/* players= */ 1, /* salvoMode= */ false, /* minesMode= */ false); break;
+        case '2': launchGame(/* players= */ 2, /* salvoMode= */ false, /* minesMode= */ false); break;
+        case '3': launchGame(/* players= */ 1, /* salvoMode= */ true, /* minesMode= */ false); break;
+        case '4': launchGame(/* players= */ 2, /* salvoMode= */ true, /* minesMode= */ false); break;
+        case '5': launchGame(/* players= */ 1, /* salvoMode= */ false, /* minesMode= */ true); break;
+        case '6': launchGame(/* players= */ 2, /* salvoMode= */ false, /* minesMode= */ true); break;
+        case '7': launchGame(/* players= */ 0, /* salvoMode= */ false, /* minesMode= */ true); break;
+        case '8': launchGame(/* players= */ 1, /* salvoMode= */ true, /* minesMode= */ true); break;
+        case '9': launchExperiment(); break;
+        case 'q': quit(); break;
         default: cout << "Please enter a valid option.\n\n";
       }
     // if more than one character was entered, it wasn't a valid option
@@ -990,9 +1004,6 @@ void GameController::menu() {
 
 /** Launches a two player game with the given number of human players, and the given game modes. */
 void GameController::launchGame(int numberOfHumanPlayers, bool salvoMode, bool minesMode) {
-  // reset pause and prompt
-  pause_ = PAUSE_IN_SECONDS;
-  prompt_ = true;
   // create two players
   Board board1(rows_, columns_);
   Player player1("Player 1", fleet_.copy(), board1);
@@ -1047,8 +1058,81 @@ void GameController::launchGame(int numberOfHumanPlayers, bool salvoMode, bool m
   takeTurns(player1, player2, salvoMode);
 }
 
-/** Blocks further execution for pause_ seconds. */
+/** Blocks further execution for PAUSE_IN_SECONDS seconds. */
 void GameController::pause() {
   // convert seconds to milliseconds
-  this_thread::sleep_for(chrono::milliseconds(pause_ * 1000));
+  this_thread::sleep_for(chrono::milliseconds(PAUSE_IN_SECONDS * 1000));
+}
+
+void GameController::launchExperiment() {
+  // ask the user how many repetitions they'd like
+  string input = "";
+  bool validInput = false;
+  while(!validInput) {
+    cout << "How many times would you like the experiment to be repeated? ";
+    getline(cin, input);
+    validInput = true;
+    for (int i = 0; i < input.length(); i++) {
+      if (!isdigit(input[i])) {
+        validInput = false;
+        break;
+      }
+    }
+  }
+  cout << "Running " << input << " tests...\n";
+  int repetitions = stoi(input);
+  // run an experiment for each repetition; using the same boat configuration,
+  // count the number of random shots it takes to sink the fleet, followed by
+  // the number of shots using the targeting algorithm
+  int totalRandomShots = 0;
+  int totalCalculatedShots = 0;
+  for (int i = 1; i <= repetitions; i++) {
+    cout << "\tTest " + to_string(i) << ": ";
+    // create a player
+    Board board(rows_, columns_);
+    Player player("Player", fleet_.copy(), board);
+    // randomly place the player's boats
+    placeRemainingBoats(player);
+    // count the number of random shots it takes to sink this player's boats
+    int randomShots = 0;
+    while (player.survivingBoats() > 0) {
+      randomShots++;
+      if (!torpedoRandom(player, /* outputToConsole= */ false)) {
+        cout << "\nTorpedo random failed.\n";
+        return;
+      }
+    }
+    cout << "random: " << to_string(randomShots);
+    totalRandomShots += randomShots;
+    // reset the player's surviving boats
+    player.resetSurvivingBoats();
+    // reset the player's board squares to not be torpedoed
+    for (int j = 1; j <= player.board().rows(); j++) {
+      for (int k = 1; k <= player.board().columns(); k++) {
+        Coordinate cjk(j, k);
+        player.board().getSquare(cjk).setTorpedoed(false);
+      }
+    }
+    // reset the player's boat damage
+    for (int j = 0; j < player.fleet().size(); j++) {
+      player.getBoat(j).resetDamage();
+    }
+    // reset the player's target stack
+    player.clearTargets();
+    // count the number of targeted shots it takes to sink the player's boats
+    int calculatedShots = 0;
+    while (player.survivingBoats() > 0) {
+      calculatedShots++;
+      if (!torpedoCalculated(player, /* outputToConsole= */ false)) {
+        cout << "\nTorpedo calculated failed.\n";
+        return;
+      }
+    }
+    cout << ", calculated: " << to_string(calculatedShots) << "\n";
+    totalCalculatedShots += calculatedShots;
+  }
+  cout << "Average number of shots using random selection: " << to_string(totalRandomShots / repetitions) << "\n"; 
+  cout << "Average number of shots using targeting algorithm: " << to_string(totalCalculatedShots / repetitions) << "\n\n";
+
+  pause(); 
 }

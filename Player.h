@@ -83,11 +83,19 @@ class Player {
       survivingBoats_--;
     }
 
+    void resetSurvivingBoats() {
+      survivingBoats_ = fleet_.size();
+    }
+
     void incrementShotsTaken() {
       shotsTaken_++;
     }
 
     void addTarget(Coordinate coordinate) {
       targets_.push(coordinate);
+    }
+
+    void clearTargets() {
+      targets_.setSize(0);
     }
 };
