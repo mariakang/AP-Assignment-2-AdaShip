@@ -21,7 +21,6 @@ class GameController {
     int columns_;
     int mines_;
     bool showComputerBoard_;
-    bool useTargetingAlgorithm_;
     int pause_;
     bool prompt_;
     CoordinateConverter converter_;
@@ -29,12 +28,6 @@ class GameController {
 
     int randomNumber(int upperBound);
     void calculateProbabilities(Player& player);
-    void removePause() {
-      pause_ = 0;
-    }
-    void removePrompt() {
-      prompt_ = false;
-    }
 
   public:
     GameController(Config config);
@@ -72,7 +65,7 @@ class GameController {
 
     void postTorpedoRoutine(Player& player, Player& opponent);
 
-    bool gameEnd(Player& player);
+    bool gameEnd(Player& player, Player& opponent);
 
     void promptToContinue();
 

@@ -769,18 +769,19 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
     }
     // fire the given number of torpedoes
     for (int i = 0; i < allowedShots; i++) {
-      // if the difficulty level was set to 'hard', use the targeting algorithm
-      if (useTargetingAlgorithm_) {
+      // if the difficulty level was increased, use the targeting algorithm
+      if (player.useTargetingAlgorithm()) {
         torpedoCalculated(opponent);
       // otherwise, pick a target randomly
       } else {
         torpedoRandom(opponent);
       }
+      // print
       postTorpedoRoutine(player, opponent);
       // check to see if we have a winner
       if (opponent.survivingBoats() == 0) {
         // if so, run the gameEnd function
-        return gameEnd(player);
+        return gameEnd(player, opponent);
       }
     }
 
@@ -819,7 +820,7 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
           // check to see if we have a winner
           if (opponent.survivingBoats() == 0) {
           // if so, run the gameEnd function
-            return gameEnd(player);
+            return gameEnd(player, opponent);
           }
         }
         break;
@@ -867,7 +868,7 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
             // check to see if we have a winner
             if (opponent.survivingBoats() == 0) {
             // if so, run the gameEnd function
-              return gameEnd(player);
+              return gameEnd(player, opponent);
             }
           }
         }
@@ -882,9 +883,9 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
 
 /** Runs immediately after 'player' has fired a torpedo at 'opponent'. */
 void GameController::postTorpedoRoutine(Player& player, Player& opponent) {
-  // update the number of shots taken, and pause briefly
+  // update the number of shots taken
   player.incrementShotsTaken();
-  // print the player's target board
+  // print the player's target board, and pause briefly
   if (!player.isComputer() || showComputerBoard_) {
     BoardPrinter printer;
     printer.printBoardOpponentView(opponent);
@@ -892,14 +893,17 @@ void GameController::postTorpedoRoutine(Player& player, Player& opponent) {
   }
 }
 
-/** Runs when the given player has won. */
-bool GameController::gameEnd(Player& player) {
-  if (player.isComputer()) {
+/** Runs when the given player has beaten their opponent. */
+bool GameController::gameEnd(Player& player, Player& opponent) {
+  // if the computer has beaten the user, display a message to the loser
+  if (player.isComputer() && !opponent.isComputer()) {
     cout << "\nOh no, you've lost! Better luck next time...\n\n";
+  // otherwise, display a message to the winner (which may be a computer)
   } else {
     cout << "\nCongratulations " << player.name();
     cout << "! You've won in " << to_string(player.shotsTaken()) << " shots!\n\n";
   }
+  // briefly pause before prompting the user to continue
   pause();
   promptToContinue();
   return true;
@@ -907,12 +911,16 @@ bool GameController::gameEnd(Player& player) {
 
 /** Prompts the user to press return before continuing. */
 void GameController::promptToContinue() {
+  // the 'prompt_' field allows us to switch this off for automated experiments
   if (prompt_) {
+    // ask the user what they'd like to do
     string response = "";
     cout << "\nPress 'Enter' to continue... ('r' to return to the main menu or 'q' to quit): ";
     getline(cin, response);
+    // if the response begins with 'q' (or 'Q') then exit the program
     if (tolower(response[0]) == 'q') {
       quit();
+    // if the response begins with 'r' (or 'R') then return to the main menu
     } else if (tolower(response[0]) == 'r') {
       menu();
     }
@@ -936,7 +944,9 @@ void GameController::quit() {
 void GameController::menu() {
   cout << "\nWelcome to AdaShip!\n\n";
   pause();
+  // this will keep looping until the user chooses to exit the program
   while (true) {
+    // display the options and capture the input entered
     string input = "";
     cout << "Please select an option:\n";
     cout << "\t1 - One player v computer game\n";
@@ -950,6 +960,7 @@ void GameController::menu() {
     cout << "\t9 - Two player game (salvo mode with hidden mines)\n";
     cout << "\tq - Quit\n\n";
     getline(cin, input);
+    // if a single character has been entered, convert it to char, and carry out the request
     if (input.length() == 1) {
       char choice = input[0];
       switch (choice) {
@@ -965,36 +976,56 @@ void GameController::menu() {
         case 'q': quit();
         default: cout << "Please enter a valid option.\n\n";
       }
+    // if more than one character was entered, it wasn't a valid option
     } else {
       cout << "Please enter a valid option.\n\n";
     }
   }
 }
 
+/** Launches a two player game with the given number of human players, and the given game modes. */
 void GameController::launchGame(int numberOfHumanPlayers, bool salvoMode, bool minesMode) {
+  // reset pause and prompt
+  pause_ = PAUSE_IN_SECONDS;
+  prompt_ = true;
+  // create two players
   Board board1(rows_, columns_);
   Player player1("Player 1", fleet_.copy(), board1);
   Board board2(rows_, columns_);
   Player player2("Player 2", fleet_.copy(), board2);
 
+  // if at least one of the players is the computer, update the player(s)
   if (numberOfHumanPlayers < 2) {
+    // if exactly one player is the computer, rename player2 'Computer' and set 'isComputer' to true
     if (numberOfHumanPlayers == 1) {
       player2.setName("Computer");
       player2.setIsComputer(true);
+      // ask the user if they'd like to hide the computer's board (it will be shown by default)
+      string input = "";
+      cout << "\nWould you like to hide the computer's board? (Enter 'y' or the board will be shown): ";
+      getline(cin, input);
+      if (input.length() > 0 && tolower(input[0]) == 'y') {
+        showComputerBoard_ = false;
+      } else {
+        showComputerBoard_ = true;
+      }
+      // ask the user if they'd like to increase the difficulty; increasing the difficulty will
+      // make the computer use the targeting algorithm instead of picking randomly
+      cout << "\nWould you like to increase the difficulty? (Enter 'y' to increase the difficulty): ";
+      getline(cin, input);
+      if (input.length() > 0 && tolower(input[0]) == 'y') {
+        player2.setUseTargetingAlgorithm(true);
+      }
+    // if both players are computers, rename them to 'Computer 1' and 'Computer 2', and set isComputer
+    // to true; both computers' boards will be shown
     } else if (numberOfHumanPlayers == 0) {
-      removePrompt();
       player1.setName("Computer 1");
       player1.setIsComputer(true);
       player2.setName("Computer 2");
       player2.setIsComputer(true);
     }
-    string input = "";
-    cout << "\nWould you like to hide the computer's board? (Enter 'y' or the board will be shown): ";
-    getline(cin, input);
-    if (input.length() > 0 && tolower(input[0]) == 'y') {
-      showComputerBoard_ = false;
-    }
   }
+  // run the setup method for each player (which places ships and - if applicable - mines)
   cout << "\nSetting up board for " << player1.name() << "...\n";
   pause();
   gameSetup(player1, minesMode);
@@ -1002,6 +1033,8 @@ void GameController::launchGame(int numberOfHumanPlayers, bool salvoMode, bool m
   pause();
   gameSetup(player2, minesMode);
 
+  // launch the 'takeTurns' sequence (with player1 going first); this will loop until a winner is
+  // found 
   takeTurns(player1, player2, salvoMode);
 }
 

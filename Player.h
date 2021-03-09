@@ -13,6 +13,7 @@ class Player {
   private:
     string name_;
     bool isComputer_;
+    bool useTargetingAlgorithm_;
     int survivingBoats_;
     int shotsTaken_;
     Fleet fleet_;
@@ -23,6 +24,7 @@ class Player {
     Player(string name, Fleet fleet, Board board) {
       name_ = name;
       isComputer_ = false;
+      useTargetingAlgorithm_ = false;
       survivingBoats_ = fleet.size();
       shotsTaken_ = 0;
       fleet_ = fleet;
@@ -43,6 +45,14 @@ class Player {
 
     void setIsComputer(bool isComputer) {
       isComputer_ = isComputer;
+    }
+
+    bool useTargetingAlgorithm() {
+      return useTargetingAlgorithm_;
+    }
+
+    void setUseTargetingAlgorithm(bool useTargetingAlgorithm) {
+      useTargetingAlgorithm_ = useTargetingAlgorithm;
     }
 
     int survivingBoats() {
