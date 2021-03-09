@@ -738,7 +738,11 @@ bool GameController::gameSetup(Player& player,  bool minesMode) {
  * the program will be exited, or the next turn sequence automatically launched. 
  */
 bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode) {
-  cout << "\nIt's " << player.name() << "'s turn.\n";
+  if (!player.isComputer() && opponent.isComputer()) {
+    cout << "\nIt's your turn.\n";
+  } else {
+    cout << "\nIt's " << player.name() << "'s turn.\n";
+  }
   // if it's a two player game, the players may need to get into position, so prompt
   // to continue; otherwise just pause briefly.
   if (!player.isComputer() && !opponent.isComputer()) {
@@ -758,9 +762,10 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
 
   // check whether the player is the computer; if so, don't ask for user input
   if (player.isComputer()) {
+    cout << "\n";
     // print the computer's boat and target boards, unless they should be hidden
     if (showComputerBoard_) {
-      cout << "\nBoats:\n";
+      cout << "Boats:\n";
       printer.printBoard(player);
       pause();
       cout << "Targets:\n";
@@ -948,7 +953,6 @@ void GameController::menu() {
   while (true) {
     // display the options and capture the input entered
     string input = "";
-    cout << "Please select an option:\n";
     cout << "\t1 - One player v computer game\n";
     cout << "\t2 - Two player game\n";
     cout << "\t3 - One player v computer (salvo mode)\n";
@@ -958,7 +962,8 @@ void GameController::menu() {
     cout << "\t7 - Computer v computer (hidden mines)\n";
     cout << "\t8 - One player v computer (salvo mode with hidden mines)\n";
     cout << "\t9 - Two player game (salvo mode with hidden mines)\n";
-    cout << "\tq - Quit\n\n";
+    cout << "\tq - Quit\n";
+    cout << "\nPlease select an option: ";
     getline(cin, input);
     // if a single character has been entered, convert it to char, and carry out the request
     if (input.length() == 1) {
@@ -1011,7 +1016,7 @@ void GameController::launchGame(int numberOfHumanPlayers, bool salvoMode, bool m
       }
       // ask the user if they'd like to increase the difficulty; increasing the difficulty will
       // make the computer use the targeting algorithm instead of picking randomly
-      cout << "\nWould you like to increase the difficulty? (Enter 'y' to increase the difficulty): ";
+      cout << "Would you like to increase the difficulty? (Enter 'y' to increase the difficulty): ";
       getline(cin, input);
       if (input.length() > 0 && tolower(input[0]) == 'y') {
         player2.setUseTargetingAlgorithm(true);
@@ -1026,10 +1031,14 @@ void GameController::launchGame(int numberOfHumanPlayers, bool salvoMode, bool m
     }
   }
   // run the setup method for each player (which places ships and - if applicable - mines)
-  cout << "\nSetting up board for " << player1.name() << "...\n";
+  if (numberOfHumanPlayers == 1) {
+    cout << "\nSetting up your board...\n";
+  } else {
+    cout << "\nSetting up " << player1.name() << "'s board...\n";
+  }
   pause();
   gameSetup(player1, minesMode);
-  cout << "\nSetting up board for " << player2.name() << "...\n";
+  cout << "\nSetting up " << player2.name() << "'s board...\n";
   pause();
   gameSetup(player2, minesMode);
 
