@@ -8,11 +8,17 @@ using namespace std;
 #include "Fleet.h"
 
 #define CONFIG_FILE_NAME "adaship_config.ini" // the name of the config file to be read
+
+// headings which could appear in the config file
 #define BOARD "board"
 #define BOAT "boat"
 #define MINES "mines"
 
-/** Reads config file and populates Config. */
+/** 
+ * Reads the config file and updates the Config object accordingly.
+ *
+ * Returns whether or not the action completed successfully.
+ */
 bool Config::readConfigFile() {
   cout << "Reading config file...\n";
   // define an iterator to iterate over the config file, and a variable to
@@ -61,6 +67,12 @@ bool Config::readConfigFile() {
 	return (dimensionsSet && boatAdded);
 }
 
+/** 
+ * Sets the board dimensions to those specified by the given
+ * line of the config file, beginning at the given index.
+ *
+ * Returns whether or not the action was completed successfully.
+ */
 bool Config::setBoardDimensions(string configLine, int index) {
   string rows = "";
   string columns = "";
@@ -101,6 +113,12 @@ bool Config::setBoardDimensions(string configLine, int index) {
   return true; 
 }
 
+/** 
+ * Creates a Boat from the given line of the config file,
+ * beginning at the given index, and adds it to the Fleet.
+ *
+ * Returns whether or not the action was completed successfully.
+ */
 bool Config::addBoat(string configLine, int index) {
   // if the first line is a space, skip over it
   if (configLine[index] == ' ') {
@@ -138,6 +156,12 @@ bool Config::addBoat(string configLine, int index) {
   return true;
 }
 
+/** 
+ * Sets the number of mines to that specified by the given line
+ * of the config file, beginning at the given index.
+ *
+ * Returns whether or not the action was completed successfully.
+ */
 bool Config::setNumberOfMines(string configLine, int index) {
   string mines = "";
   // skip over the non-numeric characters
