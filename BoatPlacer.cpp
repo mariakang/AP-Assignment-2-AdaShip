@@ -49,7 +49,8 @@ bool BoatPlacer::placeBoat(Player& player, int boatId, Coordinate c, bool vertic
     }
     return false;
   }
-
+  
+  // update the boat object
   boat.setStart(c);
   boat.setVertical(vertical);
 
@@ -268,8 +269,8 @@ bool BoatPlacer::removeBoat(Player& player, Boat& boat) {
 }
 
 /** 
- * Places the boat with the given boatId on the given player's board, at the given
- * Coordinate and orientation.
+ * Places the boat with the given boatId on the given player's board, at a
+ * randomly chosen Coordinate and orientation.
  *
  * Returns whether or not the action was completed successfully.
  */
@@ -309,7 +310,11 @@ bool BoatPlacer::placeBoatRandom(Player& player, int boatId) {
   return placeBoat(player, boatId, c, vertical);
 }
 
-/** Randomly places any unplaced boats on the given player's board. */
+/** 
+ * Randomly places any unplaced boats on the given player's board.
+ *
+ * Returns whether or not the action was completed successfully.
+ */
 bool BoatPlacer::placeRemainingBoats(Player& player) {
   // iterate over the player's fleet ('i' corresponds to the boatId)
   for (int i = 0; i < player.fleet().size(); i++) {
