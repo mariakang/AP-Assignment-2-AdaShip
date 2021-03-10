@@ -1,6 +1,4 @@
 #include <iostream>
-#include <map>
-#include <iterator>
 #include <string>
 #include <time.h>
 #include <chrono>
@@ -17,7 +15,7 @@ using namespace std;
 #include "Player.h"
 #include "TorpedoLauncher.h"
 
-#define MAX_LOOP_COUNT 1000
+#define MAX_LOOP_COUNT 1000 // for the method that randomly places mines
 #define PAUSE_IN_SECONDS 1
 
 /** Constructor function for GameController. */

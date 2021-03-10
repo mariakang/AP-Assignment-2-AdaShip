@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <time.h>
 #include <chrono>
 #include <thread>
 
@@ -73,6 +72,14 @@ bool TorpedoLauncher::torpedo(Player& player, Coordinate c, bool outputToConsole
     // boats the player has left
     if (boat.isSunk()) {
       player.decrementSurvivingBoats();
+      // if appropriate, output the name of the boat (this is part
+      // of the 'AdaShip' specification, but not part of a standard
+      // battleships game and may have implications on strategy;
+      // for example if a player wishes to 'cluster' their ships to
+      // obfuscate which ones have been hit)
+      if (outputToConsole) {
+        cout << boat.name() << " has been sunk!\n";
+      }
     }
     // add the four adjacent coordinates to the player's
     // target stack (to be used by their opponent's targeting
@@ -170,11 +177,21 @@ void TorpedoLauncher::calculateProbabilities(Player& player) {
   Board& board = player.board();
   board.clearProbabilities();
 
-  // store the boat lengths in an array
+  // store the lengths of the surviving boats in an array (in
+  // other versions of battleships, a player may not be told when
+  // they have sunk an opponent's boat, but the specification for
+  // 'AdaShip' states that players should be notified)
   int fleetSize = player.fleet().size();
   int boatLengths[fleetSize];
+  int boatLengthsSize = 0;
+  // iterate over the fleet
   for (int i = 0; i < fleetSize; i++) {
-    boatLengths[i] = player.getBoat(i).length();
+    Boat& boat = player.getBoat(i);
+    // if the boat hasn't been sunk, add its length to the array
+    if (!boat.isSunk()) {
+      boatLengths[boatLengthsSize] = boat.length();
+      boatLengthsSize++;
+    }
   }
   // iterate over the board
   for (int i = 1; i <= board.rows(); i++) {
@@ -184,8 +201,8 @@ void TorpedoLauncher::calculateProbabilities(Player& player) {
       // if the square has already been missed, skip it (we can't place any
       // boat here)
       if (!squareij.isMiss()) {
-        // iterate over the fleet
-        for (int k = 0; k < fleetSize; k++) {
+        // iterate over the stored boat lengths
+        for (int k = 0; k < boatLengthsSize; k++) {
           int boatLength = boatLengths[k];
           // check to see if a boat of this length could be placed here
           // vertically; if it doesn't fit on the board, move on
