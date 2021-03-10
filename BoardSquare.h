@@ -1,5 +1,6 @@
 #pragma once
 
+/** Contains information about a square of a board. */
 class BoardSquare {
   private:
     /** The boat ID. */
