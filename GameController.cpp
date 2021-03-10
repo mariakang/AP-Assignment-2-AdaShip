@@ -28,6 +28,7 @@ GameController::GameController(Config config) {
     mines_ = rows_;
   }
   showComputerBoard_ = true;
+  gameInProgress_ = false;
   CoordinateConverter converter(rows_, columns_);
   converter_ = converter;
   fleet_ = config.fleet().copy();
@@ -137,9 +138,21 @@ void GameController::launchGame(int numberOfHumanPlayers, bool salvoMode, bool m
   pause();
   gameSetup(player2, minesMode);
 
-  // launch the 'takeTurns' sequence (with player1 going first); this will loop until a winner is
-  // found 
-  takeTurns(player1, player2, salvoMode);
+  // start a game
+  gameInProgress_ = true;
+  // keep track of whose turn it is (player1 will go first)
+  bool player1sTurn = true;
+
+  // keep taking turns (with player1 going first) until a winner is found
+  while (gameInProgress_) {
+    if (player1sTurn) {
+      takeTurn(player1, player2, salvoMode);
+    } else {
+      takeTurn(player2, player1, salvoMode);
+    }
+    // switch players
+    player1sTurn = !player1sTurn;
+  }
 }
 
 /** Launches an experiment to compare random selection with the targeting algorithm. */
@@ -413,10 +426,9 @@ bool GameController::gameSetup(Player& player,  bool minesMode) {
  * Runs when the given player takes a turn against their opponent.
  *
  * When the turn is complete, if the player has won, the 'gameEnd' method will be
- * called. Otherwise, the user will be prompted to continue (or quit), and either
- * the program will be exited, or the next turn sequence automatically launched. 
+ * called.
  */
-bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode) {
+bool GameController::takeTurn(Player& player, Player& opponent, bool salvoMode) {
   if (!player.isComputer() && opponent.isComputer()) {
     cout << "\nIt's your turn.\n";
   } else {
@@ -563,7 +575,7 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
   // prompt the user to press enter to continue (or 'q' to quit)
   promptToContinue();
   // now it's the opponent's turn
-  return takeTurns(opponent, player, salvoMode);
+  return true;
 }
 
 /** 
@@ -585,6 +597,8 @@ void GameController::postTorpedoRoutine(Player& player, Player& opponent) {
 
 /** Runs when the given player has beaten their opponent. */
 bool GameController::gameEnd(Player& player, Player& opponent) {
+  // update gameInProgress_ to false, to stop the loop
+  gameInProgress_ = false;
   // if the computer has beaten the user, display a message to the loser
   if (player.isComputer() && !opponent.isComputer()) {
     cout << "\nOh no, you've lost! Better luck next time...\n\n";

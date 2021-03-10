@@ -18,6 +18,8 @@ class GameController {
     int mines_;
     /** Whether or not the computer's board is output to the console. */
     bool showComputerBoard_;
+    /** Whether or not a game is in progress. */
+    bool gameInProgress_;
     /** Helper object to convert between strings and board locations. */
     CoordinateConverter converter_;
     /** The collection of boats each player is given. */
@@ -50,12 +52,11 @@ class GameController {
      * Runs when the given player takes a turn against their opponent.
      *
      * When the turn is complete, if the player has won, the 'gameEnd' method will be
-     * called. Otherwise, the user will be prompted to continue (or quit), and either
-     * the program will be exited, or the next turn sequence automatically launched.
+     * called.
      *
      * Returns whether or not the action completed successfully.
      */
-    bool takeTurns(Player& player, Player& opponent, bool salvoMode);
+    bool takeTurn(Player& player, Player& opponent, bool salvoMode);
 
     /** 
      * Increments the number of shots taken by the given player, and prints their
