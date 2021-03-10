@@ -16,9 +16,8 @@ using namespace std;
 #include "TorpedoLauncher.h"
 
 #define MAX_LOOP_COUNT 1000 // for the method that randomly places mines
-#define PAUSE_IN_SECONDS 1
 
-/** Constructor function for GameController. */
+/** Constructor method for GameController. */
 GameController::GameController(Config config) {
   // set number of rows and columns
   rows_ = config.rows();
@@ -40,14 +39,18 @@ GameController::GameController(Config config) {
   srand (time(NULL));
 }
 
-/** Displays the main menu. */
+/** 
+ * Displays the main menu and executes the chosen option, looping until the user
+ * chooses to quit the program.
+ */
 void GameController::menu() {
-  cout << "\nWelcome to AdaShip!\n\n";
+  cout << "\nWelcome to AdaShip!\n";
   pause();
   // this will keep looping until the user chooses to exit the program
   while (true) {
     // display the options and capture the input entered
     string input = "";
+    cout << "\nMenu:\n";
     cout << "\t1 - One player v computer game\n";
     cout << "\t2 - Two player game\n";
     cout << "\t3 - One player v computer (salvo mode)\n";
@@ -147,6 +150,7 @@ void GameController::launchExperiment() {
   // ask the user how many repetitions they'd like
   string input = "";
   bool validInput = false;
+  // keep looping until the user has entered a valid number
   while(!validInput) {
     cout << "How many times would you like the experiment to be repeated? ";
     getline(cin, input);
@@ -538,7 +542,12 @@ bool GameController::takeTurns(Player& player, Player& opponent, bool salvoMode)
   return takeTurns(opponent, player, salvoMode);
 }
 
-/** Runs immediately after 'player' has fired a torpedo at 'opponent'. */
+/** 
+ * Increments the number of shots taken by the given player, and prints their target
+ * board to the console.
+ *
+ * Runs immediately after 'player' has fired a torpedo at 'opponent'.
+ */
 void GameController::postTorpedoRoutine(Player& player, Player& opponent) {
   // update the number of shots taken
   player.incrementShotsTaken();
