@@ -7,7 +7,6 @@ using namespace std;
 #include "BoardPrinter.h"
 #include "BoardSquare.h"
 #include "Boat.h"
-#include "Config.h"
 #include "Coordinate.h"
 #include "CoordinateConverter.h"
 #include "Player.h"
@@ -49,7 +48,13 @@ using namespace std;
 // have before the boats key will be printed underneath
 #define COLUMNS_THRESHOLD 30
 
-/** Prints the given player's own board, displaying their own boats. */
+/** 
+ * Prints the given player's own board, displaying their own boats. 
+ *
+ * If setupMode is set to true, then placed boats will be greyed out;
+ * if set to false, then boats will be colour-coded based on damage.
+ * By default, it's set to false.
+ */
 void BoardPrinter::printBoard(Player player, bool setupMode) {
   // get player's board
   Board& board = player.board();
@@ -91,7 +96,7 @@ void BoardPrinter::printBoard(Player player, bool setupMode) {
     }
     // we've reached the end of the row; if the board is narrow enough,
     // and the row number corresponds to a boat display ID, print a line
-    // of the boats key
+    // of the boats key to appear to the right of the board
     if (columns <= COLUMNS_THRESHOLD && i <= player.fleet().size()) {
       printBoatsKeyLine(player, i - 1, setupMode);
     } else {
@@ -99,7 +104,7 @@ void BoardPrinter::printBoard(Player player, bool setupMode) {
     }
   }
   cout << "\n";
-  // the board is wide, print the boats key underneath it 
+  // if the board is wide, print the boats key underneath it instead
   if (columns > COLUMNS_THRESHOLD) {
     printBoatsKey(player, setupMode);
   }
@@ -153,7 +158,12 @@ void BoardPrinter::printBoardOpponentView(Player player) {
   cout << "\n";
 }
 
-/** Prints the boats key. */
+/** 
+ * Prints the boats key. 
+ *
+ * If setupMode is set to true, then placed boats will be greyed out;
+ * if set to false, then boats will be colour-coded based on damage.
+ */
 void BoardPrinter::printBoatsKey(Player player, bool setupMode) {
   // iterate over the player's fleet ('i' corresponds to the boatId)
   for (int i = 0; i < player.fleet().size(); i++) {
@@ -162,13 +172,24 @@ void BoardPrinter::printBoatsKey(Player player, bool setupMode) {
   cout << "\n";
 }
 
-/** Prints a line of the boats key. */
+/** 
+ * Prints a line of the boats key. 
+ *
+ * If setupMode is set to true, then placed boats will be greyed out;
+ * if set to false, then boats will be colour-coded based on damage.
+ */
 void BoardPrinter::printBoatsKeyLine(Player player, int boatId, bool setupMode) {
+  // get the boat corresponding to the given ID
   Boat& boat = player.getBoat(boatId);
+  // if we're in setup mode and the boat has been placed, grey it out
+  // (including the number)
   if (setupMode && boat.isPlaced()) {
     cout << PLACED_BOAT_PREFIX;
   }
+  // print the formatted boat number
   cout << "\t" << displayId(boatId) << " - ";
+  // if we're not in setup mode, colour the boat (excluding its number)
+  // according to its damage
   if (!setupMode) {
     if (boat.damage() > 0) {
       if (boat.isSunk()) {
@@ -182,15 +203,18 @@ void BoardPrinter::printBoatsKeyLine(Player player, int boatId, bool setupMode) 
   } else {
     cout << " ";
   }
+  // if we're in setup mode, include the boat's name and length
   if (setupMode) {
     cout << boat.toString();
+  // otherwise, just print its name
   } else {
     cout << boat.name();
   }
+  // reset the formatting
   cout << BOAT_SUFFIX << "\n";
 }
 
-/** Prints the column headings and underline. */
+/** Prints the first two rows of the board (headings and underline). */
 void BoardPrinter::printHeader(int columns) {
   // create a converter with the correct number of columns;
   // we will use this to convert column numbers into
@@ -217,7 +241,7 @@ void BoardPrinter::printHeader(int columns) {
   cout << "\n";
 }
 
-/** Prints a board square occupied by the given boat. */
+/** Prints the given occupied board square. */
 void BoardPrinter::printBoatSquare(BoardSquare square) {
   // format the text, depending on whether the square is hit and/or has a mine
   if (square.torpedoed()) {
@@ -233,6 +257,7 @@ void BoardPrinter::printBoatSquare(BoardSquare square) {
       cout << BOAT_PREFIX;
     }
   }
+  // print the boat's formatted number, and reset the colour formatting
   cout << displayId(square.boatId()) << BOAT_SUFFIX;
 }
 
