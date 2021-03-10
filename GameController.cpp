@@ -273,27 +273,45 @@ bool GameController::gameSetup(Player& player,  bool minesMode) {
   } else {
     int placedBoats = 0;
     int fleetSize = player.fleet().size();
-    // keep looping until all of the boats have been placed
+    // keep looping until all of the boats have been placed and confirmation is received
     string input = "";
-    while (placedBoats < fleetSize) {
+    bool placementConfirmed = false;
+    while (!placementConfirmed) {
       // print the player's board (setupMode => already placed boats will be greyed out)
       printer.printBoard(player, /* setupMode= */ true);
-      cout << "Enter a boat number, reference and 'v/h' ";
-      cout << "(e.g. '1 a1 v'), or press 'Enter' to auto-place your remaining boats: ";
+      cout << "Enter a boat number, reference and 'v/h' (e.g. '1 a1 v') to place a boat.\n";
+      // if all boats have been placed, give the option to confirm placement or reset.
+      if (placedBoats == fleetSize) {
+        cout << "Alternatively, press 'Enter' to confirm placement, or 'r' to reset: ";
+      // if not all boats have been placed, give the option to auto-place remaining boats or reset
+      } else {
+        cout << "Alternatively, press 'Enter' to auto-place your remaining boats, or 'r' to reset: ";
+      }
       getline(cin, input);
-      // if the user has pressed enter without specifying a position, auto-place all of
-      // their remaining boats
+      // if the user has pressed enter without specifying a position, either auto-place all of
+      // their remaining boats or set confirmation received to true
       if (input.length() == 0) {
-        if (!placer.placeRemainingBoats(player)) {
-          cout << "\nUnable to auto-place your remaining boats.\n";
-          pause();
-          return false;
-        // if all of the boats were successfully placed, print the board and update 'placedBoats'
+        // if all boats have been placed, set placementConfirmed to true, and exit the loop
+        if (placedBoats == fleetSize) {
+          placementConfirmed = true;
+          break;
+        // if not all boats have been placed, auto-place the remainder
         } else {
-          printer.printBoard(player);
-          placedBoats = fleetSize;
+          if (!placer.placeRemainingBoats(player)) {
+            cout << "\nUnable to auto-place your remaining boats.\n";
+            pause();
+            return false;
+          // if all of the boats were successfully placed, update 'placedBoats'
+          } else {
+            placedBoats = fleetSize;
+          }
         }
-      // if the user entered something, check to see if it is valid input
+      // if the user entered a string beginning with 'r' (or 'R'), reset the board
+      // and reset placedBoats to 0
+      } else if (tolower(input[0]) == 'r') {
+        placer.reset(player);
+        placedBoats = 0;
+      // if the user entered something else, check to see if it is valid input
       } else {
         string boatNumber = "";
         string reference = "";
@@ -345,24 +363,30 @@ bool GameController::gameSetup(Player& player,  bool minesMode) {
         if (validInput) {
           // get the arguments to pass to '#placeBoat()'
           int boatId = stoi(boatNumber) - 1;
+          bool alreadyPlaced = player.getBoat(boatId).isPlaced();
           Coordinate c = converter_.getCoordinate(reference);
           bool vertical = tolower(vh[0]) == 'v';
           // if the boat can't be placed here, loop again
           if (!placer.placeBoat(player, boatId, c, vertical)) {
             cout << "Unable to place boat " << boatNumber << " in " << reference << "\n.";
             pause();
-          // if the boat's been successfully placed, update 'placedBoats'
+          // if the boat's been successfully placed, and wasn't already placed, update 'placedBoats'
           } else {
-            placedBoats++;
+            if (!alreadyPlaced) {
+              placedBoats++;
+            }
           }
         // if the input is invalid, loop again
         } else {
           pause();
         }
       }
+      // if all boats have now been placed, output a message.
+      if (placedBoats == fleetSize) {
+        cout << "\nAll of your boats have now been placed.\n";
+        pause();
+      }
     }
-    cout << "\nAll of your boats have now been placed.\n";
-    pause();
   }
 
   // if in 'hidden mines' mode, randomly place the required number of mines

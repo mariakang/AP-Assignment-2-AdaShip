@@ -329,3 +329,15 @@ bool BoatPlacer::placeRemainingBoats(Player& player) {
   }
   return true;
 }
+
+/** Resets the player's board. */
+void BoatPlacer::reset(Player& player) {
+  // iterate over the player's fleet
+  for (int i = 0; i < player.fleet().size(); i++) {
+    Boat& boat = player.getBoat(i);
+    // if the boat has been placed, remove it
+    if (boat.isPlaced()) {
+      removeBoat(player, boat);
+    }
+  }
+}

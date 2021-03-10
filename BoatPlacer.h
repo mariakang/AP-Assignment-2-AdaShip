@@ -42,4 +42,7 @@ class BoatPlacer {
      * Returns whether or not the action was completed successfully.
      */
     bool placeRemainingBoats(Player& player);
+
+    /** Resets the player's board. */
+    void reset(Player& player);
 };
