@@ -8,6 +8,7 @@ using namespace std;
 #include "BoardSquare.h"
 #include "Player.h"
 
+/** Prints a formatted view of the player's board to the console. */
 class BoardPrinter {
   private:
     /** Prints the first two rows of the board (headings and underline). */

@@ -6,6 +6,7 @@
 #define MAX_ROWS 80
 #define MAX_COLUMNS 80
 
+/** Represents a player's board. */
 class Board {
   private:
     /** The number of rows in the board. */
