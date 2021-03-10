@@ -6,6 +6,7 @@ using namespace std;
 
 #include "Fleet.h"
 
+/** Reads and stores information held in the user-provided config file. */ 
 class Config {
   private:
     /** The number of board rows. */
