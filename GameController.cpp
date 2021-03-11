@@ -230,7 +230,7 @@ void GameController::launchExperiment() {
   cout << "Average number of shots using random selection: " << to_string(totalRandomShots / repetitions) << "\n"; 
   cout << "Average number of shots using targeting algorithm: " << to_string(totalCalculatedShots / repetitions) << "\n\n";
 
-  pause(); 
+  promptToContinue(); 
 }
 
 /** Returns a randomly generated number between 1 and 'upperBound' inclusive. */
