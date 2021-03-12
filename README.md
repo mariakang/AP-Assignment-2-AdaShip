@@ -104,3 +104,9 @@ Details on the implementation of the enhanced targeting algorithm are given belo
 [AdaShip Class Diagram](https://maria-kang.com/photos/adaship/AdaShip-Class-Diagram.png)
 ![AdaShip Class Diagram](https://maria-kang.com/photos/adaship/AdaShip-Class-Diagram.png)
 
+## 3. Evaluation
+
+### 3.X. Enhanced Targeting algorithm
+
+![Screenshot 1](https://maria-kang.com/photos/adaship/Screenshot-2021-03-12-1.png)
+![Screenshot 2](https://maria-kang.com/photos/adaship/Screenshot-2021-03-12-2.png)
