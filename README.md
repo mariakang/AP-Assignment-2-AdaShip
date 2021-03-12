@@ -94,3 +94,13 @@ Furthermore, the main menu contains an option ‘Run experiment (random selectio
 
 Details on the implementation of the enhanced targeting algorithm are given below in section 3.
 
+### 1.3. Flow Diagram
+
+[AdaShip Flow Diagram](https://maria-kang.com/photos/adaship/AdaShip-Flow-Diagram.png)
+![AdaShip Flow Diagram](https://maria-kang.com/photos/adaship/AdaShip-Flow-Diagram.png)
+
+### 1.4. Class Diagram
+
+[AdaShip Class Diagram](https://maria-kang.com/photos/adaship/AdaShip-Class-Diagram.png)
+![AdaShip Class Diagram](https://maria-kang.com/photos/adaship/AdaShip-Class-Diagram.png)
+
