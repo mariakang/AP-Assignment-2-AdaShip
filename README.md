@@ -150,6 +150,12 @@ When designing my class architecture, I tried to avoid making any classes too bi
 
 #### 2.1.6. Avoiding global variables and static classes
 
+I have used literal constants in my code (e.g. `MAX_ROWS` and `MAX_COLUMNS`) to improve readability, and aid maintenance by ensuring that hard coded values only need to be updated in one place. However, I have chosen to avoid using global variables or static classes. 
+
+Global variables can be altered by any part of the code, making it difficult to remember or understand every possible use. A global variable can have no access control; it cannot be limited to only specific parts of the program. Using global variables causes very tight coupling of code, and testing can be an issue as it is difficult to decouple them when writing tests.
+
+The main issue with global and static instances of classes is that the order in which they are constructed and destroyed depends on the implementation. This means that if the code relies on them being around at a certain time, this may lead to unexpected behaviour. Static classes act frequently as a global state and lead to non-deterministic behaviour which should be avoided. Also, code which uses static classes cannot be tested in isolation, making unit testing very difficult.
+
 #### 2.1.7. Member visibility
 
 #### 2.1.8. Code reuse
