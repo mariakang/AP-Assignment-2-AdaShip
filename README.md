@@ -104,6 +104,60 @@ Details on the implementation of the enhanced targeting algorithm are given belo
 [AdaShip Class Diagram](https://maria-kang.com/photos/adaship/AdaShip-Class-Diagram.png)
 ![AdaShip Class Diagram](https://maria-kang.com/photos/adaship/AdaShip-Class-Diagram.png)
 
+## 2. Development
+
+### 2.1. Adoption of Good Standards
+
+As many ‘good standards’ as possible were adopted throughout the development of this project, including the following:
+
+#### 2.1.1. Naming conventions
+
+All class names are defined in upper camel case, and all variable and function names in lower camel case. All attribute class member names end in a trailing underscore, and literal constant names are defined in upper snake case.
+
+Having consistent naming conventions makes the code much easier to read, as it provides additional context. For example, beginning class names with a capital letter makes it easier to distinguish types from variables, and using a trailing underscore for attribute members makes them distinguishable from local variables or parameters. It also makes the code more aesthetically pleasing, and hence more readable.
+
+In addition to consistency, names have been chosen to be as self-explanatory as possible. Whilst this may lead to unnecessary verbosity at times, using helpful names makes it much easier for other developers to understand the code when tasked with maintaining it in future.
+
+#### 2.1.2. Code formatting
+
+Code has been consistently formatted, for example using new lines and indentation. This includes lining up opening and closing curly braces, and ensuring that no line is too long (readers shouldn’t have to keep scrolling to the right).
+
+Consistent formatting improves aesthetics and hence readability for other developers tasked with maintaining the code, but can also make it much easier to spot and correct syntax errors early on while developing it. For example, always ending a line with a semicolon makes it easier to spot any missing ones, and lining up opening and closing braces makes it easier to spot if these have been correctly matched off.
+
+#### 2.1.3. Documentation
+
+Fairly extensive documentation has been provided above each class member/function definition to make it clear what the member is and does.
+
+Besides helping anyone wishing to maintain the code in future, documentation is potentially of great importance to end users. In this case, the end user shouldn’t need to look at the code at all, but if, for example, the product was a public API, then providing helpful documentation would be vital.
+
+In addition to providing formal documentation, I’ve also included comments throughout the code to explain what’s going on at each stage. In a professional context, extensive use of commenting should be avoidable by making the code itself as self-explanatory as possible. Comments should not be needed to say what the code does, but rather why it does it. However, in an academic context, it is important to communicate clearly how algorithms are intended to work, so comments have been used extensively to this end.
+
+#### 2.1.4. Class header files
+
+Each class definition has been written in a separate header file (whose name matches the class name), with most function implementations being written in an accompanying ‘.cpp’ file.
+
+Splitting the code out into separate files makes it much easier to navigate and find the code you’re looking for quickly. It also improves compile times during development, as the larger an individual file gets, the longer it takes to compile. If everything was in a single file, then the whole thing would have to be recompiled each time a change is made, however small. Using separate header files means only the files which have been edited need to be recompiled, potentially saving developers a lot of time.
+
+Separating out the implementation into ‘.cpp’ files and keeping the content of the header files as simple as possible greatly improves readability, as you can see at a glance what the class does and contains.
+
+#### 2.1.5. Class architecture
+
+When designing my object orientated solution to the problem, I attempted to separate out different types of functionality into different classes. For example, classes such as `BoardSquare` and `Boat` are models which store information about an element of the game, whereas `BoardPrinter` and `BoatPlacer` are concerned with printing output to the console and implementing logic to update the model classes respectively.
+
+Strictly speaking, my implementation doesn’t fit into a Model-View-Controller (MVC) framework, as the lines between view and controller are a little blurred. For example, the `GameController` class handles input and output, but also controls the flow of events. However, each class has been designed to perform a specific type of function, making it reasonably easy to identify which class is responsible for what.
+
+When designing my class architecture, I tried to avoid making any classes too big or too small. If a class is allowed to become too big then it will be a burden to maintain, and similarly a large collection of very small classes is harder to maintain than a smaller collection of slightly larger ones. The `GameController` class originally handled the logic for placing boats and firing torpedoes, but these tasks were later delegated to `BoatPlacer` and `TorpedoLauncher` classes to make these easier to read and maintain. A future enhancement could be to refactor this further to separate out everything UI-related into a separate class.
+
+#### 2.1.6. Avoiding global variables and static classes
+
+#### 2.1.7. Member visibility
+
+#### 2.1.8. Code reuse
+
+#### 2.1.9. Defensive programming
+
+#### 2.1.10. User experience design
+
 ## 3. Evaluation
 
 ### 3.X. Enhanced Targeting algorithm
