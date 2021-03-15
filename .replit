@@ -1,0 +1,2 @@
+language = "cpp"
+run = "clang++-7 -pthread -std=c++17 -o main Board.cpp BoardPrinter.cpp BoatPlacer.cpp Config.cpp CoordinateConverter.cpp CoordinateStack.cpp Fleet.cpp GameController.cpp TorpedoLauncher.cpp main.cpp && ./main"
