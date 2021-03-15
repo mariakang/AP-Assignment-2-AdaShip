@@ -185,40 +185,33 @@ void GameController::launchExperiment() {
   for (int i = 1; i <= repetitions; i++) {
     cout << "\tTest " + to_string(i) << ": ";
     // create a player
-    Board board(rows_, columns_);
-    Player player("Player", fleet_.copy(), board);
+    Board boardR(rows_, columns_);
+    Player playerR("Player R", fleet_.copy(), boardR);
     // randomly place the player's boats
-    placer.placeRemainingBoats(player);
+    placer.placeRemainingBoats(playerR);
     // count the number of random shots it takes to sink this player's boats
     int randomShots = 0;
-    while (player.survivingBoats() > 0) {
+    while (playerR.survivingBoats() > 0) {
       randomShots++;
-      launcher.torpedoRandom(player, /* outputToConsole= */ false);
+      launcher.torpedoRandom(playerR, /* outputToConsole= */ false);
     }
     // output the number of shots
     cout << "random: " << to_string(randomShots);
     // update the running total
     totalRandomShots += randomShots;
-    // reset the player's surviving boats
-    player.resetSurvivingBoats();
-    // reset the player's board squares to not be torpedoed
-    for (int j = 1; j <= player.board().rows(); j++) {
-      for (int k = 1; k <= player.board().columns(); k++) {
-        Coordinate cjk(j, k);
-        player.board().getSquare(cjk).setTorpedoed(false);
-      }
+
+    // create a second player
+    Board boardC(rows_, columns_);
+    Player playerC("Player C", fleet_.copy(), boardC);
+    // place the second player's boats in the same positions as the first player's
+    for (int i = 0; i < playerR.fleet().size(); i++) {
+      placer.placeBoat(playerC, i, playerR.getBoat(i).start(), playerR.getBoat(i).vertical());
     }
-    // reset the player's boat damage
-    for (int j = 0; j < player.fleet().size(); j++) {
-      player.getBoat(j).resetDamage();
-    }
-    // reset the player's target stack
-    player.clearTargets();
-    // count the number of targeted shots it takes to sink the player's boats
+    // count the number of targeted shots it takes to sink this player's boats
     int calculatedShots = 0;
-    while (player.survivingBoats() > 0) {
+    while (playerC.survivingBoats() > 0) {
       calculatedShots++;
-      launcher.torpedoCalculated(player, /* outputToConsole= */ false);
+      launcher.torpedoCalculated(playerC, /* outputToConsole= */ false);
     }
     // output the number of shots
     cout << ", calculated: " << to_string(calculatedShots) << "\n";
