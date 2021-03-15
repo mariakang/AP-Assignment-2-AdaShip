@@ -101,7 +101,7 @@ The following [AdaShip Flow Diagram](https://maria-kang.com/photos/adaship/AdaSh
 
 ### 1.4. Development Plan
 
-The overall development strategy was agile, with an iterative approach to design and implementation, early adoption of testing, and gradual addition of features. However, given the very short timeframe, it was deemed more efficient to 'think ahead' and incorporate some of the more enhanced features into the initial design, as opposed to creating an end-to-end minimum viable product (MVP) and only adding non-essential features once the MVP has been completed.
+The overall development strategy was agile, with an iterative approach to design and implementation, early adoption of testing, and gradual addition of features. However, given the very short timeframe, it was deemed more efficient to 'think ahead' and incorporate some of the more enhanced features into the initial design, as opposed to creating an end-to-end minimum viable product (MVP) and only adding non-essential features once the MVP had been completed.
 
 For example, the 'salvo' and 'hidden mines' modes were taken into consideration from the start when desigining the torpedo firing algorithm, so as to ensure the code would not need to be completely re-written in order to add these features. Also, the board dimensions and boat specifications (including the total number of boats) were assumed to be configurable from the start, as this strongly influenced the overall class design (for example, requiring `Boat` objects and resizable `Fleet` and `Board` objects).
 
@@ -243,7 +243,17 @@ Although user input is validated to ensure that errors are detected and handled 
 
 #### 3.2.5. User experience design
 
+Care was taken to design a user interface which would be intuitive, easy and satisfying to use. This involved making instructions as clear as possible (for example by including sample input or 'greying out' placed boats), minimising the number of required interactions or key presses (for example by using 'Enter' for likely defaults), and trying to make the rendered boards aestheitcally pleasing (for example using colours).
+
+As mentioned above, some predictable user errors (such as case) are silently corrected so as to spare the user from doing any extra work.
+
 ### 3.3. Project Highlights
+
+#### 3.3.1. Coordinate conversion
+
+#### 3.3.2. Boat placing algorithm
+
+#### 3.3.3. Board rendering
 
 ### 3.4. Enhanced Targeting algorithm
 
@@ -251,3 +261,19 @@ Although user input is validated to ensure that errors are detected and handled 
 ![Screenshot 2](https://maria-kang.com/photos/adaship/Screenshot-2021-03-12-2.png)
 
 ### 3.5. Reflective Review
+
+#### 3.5.1. Summary
+
+Given the short timeframe and my own lack of experience with the language, I'm pleased with the final product. There are undoubtedly areas for improvement, for example separating out the UI from the logic which handles events, and refactoring the random number generation, but in general, I believe the program works as intended and the code is readable with clear documentation.
+
+#### 3.5.2. Enhanced testing
+
+The main area of weakness is testing. Manual tests were carried out as early as possible at all stages of development, and a number of issues fixed as a result. However, automated tests were out of scope, and exhaustive stress testing wasn't possible within the given timeframe.
+
+In a production environment, it would be essential to write unit tests to verify the behaviour of key elements, and set up a test harness to ensure that these are automatically triggered each time a change is made. Changes made to one piece of code can often have unexpected consequences for another piece of code, making this type of automated regression testing important. Tests can also act as a form of contract for the code, making life easier for future developers tasked with maintaining it.
+
+Manual stress testing should also form part of the standard quality assurance (QA) process. QA testing involves performing deliberately intense and thorough tests to see if it's possible for a user to break the program. While a lot of manual testing was carried out, it wasn't feasible to stress test every possible scenario and edge case, making it impossible to rule out the presence of bugs.
+
+#### 3.5.3. Continued professional development
+
+During the development of this project, I learnt a lot about C++ and object-orientated programming. However, I feel I've only just scratched the surface and there's a lot more to learn. For example, there are a lot of standard data structures (sets, deques, lists etc.) which I might have used if I'd been implementing this in another language, but which I'm unfamiliar with in a C++ context. I'd therefore be very interested to learn which data structures professional C++ developers would use in various scenarios and why.
