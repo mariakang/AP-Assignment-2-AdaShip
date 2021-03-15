@@ -96,13 +96,11 @@ Details on the implementation of the enhanced targeting algorithm are given belo
 
 ### 1.3. Flow Diagram
 
-[AdaShip Flow Diagram](https://maria-kang.com/photos/adaship/AdaShip-Flow-Diagram.png)
+The following [AdaShip Flow Diagram](https://maria-kang.com/photos/adaship/AdaShip-Flow-Diagram.png) illustrates how the program works:
+
 ![AdaShip Flow Diagram](https://maria-kang.com/photos/adaship/AdaShip-Flow-Diagram.png)
 
-### 1.4. Class Diagram
-
-[AdaShip Class Diagram](https://maria-kang.com/photos/adaship/AdaShip-Class-Diagram.png)
-![AdaShip Class Diagram](https://maria-kang.com/photos/adaship/AdaShip-Class-Diagram.png)
+### 1.4. Development Plan
 
 ## 2. Development
 
@@ -140,7 +138,45 @@ Splitting the code out into separate files makes it much easier to navigate and 
 
 Separating out the implementation into ‘.cpp’ files and keeping the content of the header files as simple as possible greatly improves readability, as you can see at a glance what the class does and contains.
 
-#### 2.1.5. Class architecture
+#### 2.1.5. Code reuse
+
+### 2.2. Object-orientated Design
+
+Using an object-orientated approach to design, the project was modelled as a collection of individual elements, each of which would be written as a class. Each class consists of members; attribute members or fields containing data, and function members or methods responsible for providing a specific area of functionality.
+
+The first phase of development involved sketching out the class architecture by identifying:
+ - What the individual elements of the solution were, for example, `Player`, `Board`, `BoardSquare`, `Boat`, `BoardPrinter` etc.
+ - What pieces of information they would need to hold, for example, board dimensions, boat names and lengths, whether or not a square has been torpedoed etc.
+ - What functions they would need to perform, for example, calculating the maximum length of boat which could be placed in each square horizontally or vertically, printing a visual representation of the board to the console, etc.
+
+After sketching out an initial design, the classes were coded up in a minimal way (to enable the next stage of algorithm design and implementation to begin) and then continuously updated and amended throughout the development process as their requirements became clearer. Additional classes were also created as part of various refactoring exercises (for example creating a separate `CoordinateConverter` class), making the overall object-orientated design an iterative process.
+
+Once all of the functionality had been implemented and tested, an internal 'tidy up' operation was carried out. This involved taking each class in turn and doing the following:
+ - Removing any unused class members
+ - Making each member private unless used by another class
+ - Adding formal documentation above the declaration of each member
+
+The following [AdaShip Class Diagram](https://maria-kang.com/photos/adaship/AdaShip-Class-Diagram.png) shows all of the classes involved, their members, and how they interact with each other. Members above the line are attribute members, those below the line are function members, and member visibility is denoted by a '-' for private, or '+' for public. The relationships between classes are denoted by arrows, and include dependency, aggregation, and composition.
+
+![AdaShip Class Diagram](https://maria-kang.com/photos/adaship/AdaShip-Class-Diagram.png)
+
+For further details on the behaviour and purpose of each class and member, please refer to the documentation which immediately precedes each class and member declaration.
+
+### 2.3. Ship Placement and Torpedo Algorithms
+
+### 2.4. Parsing the Configuration File
+
+### 2.5. User Interface Implementation
+
+### 2.6. Additional Features
+
+## 3. Evaluation
+
+### 3.1. Code Refactoring
+
+### 3.2. Advanced Programming Techniques
+
+#### 3.2.1. Class architecture
 
 When designing my object orientated solution to the problem, I attempted to separate out different types of functionality into different classes. For example, classes such as `BoardSquare` and `Boat` are models which store information about an element of the game, whereas `BoardPrinter` and `BoatPlacer` are concerned with printing output to the console and implementing logic to update the model classes respectively.
 
@@ -148,7 +184,7 @@ Strictly speaking, my implementation doesn’t fit into a Model-View-Controller 
 
 When designing my class architecture, I tried to avoid making any classes too big or too small. If a class is allowed to become too big then it will be a burden to maintain, and similarly a large collection of very small classes is harder to maintain than a smaller collection of slightly larger ones. The `GameController` class originally handled the logic for placing boats and firing torpedoes, but these tasks were later delegated to `BoatPlacer` and `TorpedoLauncher` classes to make these easier to read and maintain. A future enhancement could be to refactor this further to separate out everything UI-related into a separate class.
 
-#### 2.1.6. Avoiding global variables and static classes
+#### 3.2.2. Avoiding global variables and static classes
 
 I have used literal constants in my code (e.g. `MAX_ROWS` and `MAX_COLUMNS`) to improve readability, and aid maintenance by ensuring that hard coded values only need to be updated in one place. However, I have chosen to avoid using global variables or static classes. 
 
@@ -156,17 +192,17 @@ Global variables can be altered by any part of the code, making it difficult to 
 
 The main issue with global and static instances of classes is that the order in which they are constructed and destroyed depends on the implementation. This means that if the code relies on them being around at a certain time, this may lead to unexpected behaviour. Static classes act frequently as a global state and lead to non-deterministic behaviour which should be avoided. Also, code which uses static classes cannot be tested in isolation, making unit testing very difficult.
 
-#### 2.1.7. Member visibility
+#### 3.2.3. Member visibility
 
-#### 2.1.8. Code reuse
+#### 3.2.4. Defensive programming
 
-#### 2.1.9. Defensive programming
+#### 3.2.5. User experience design
 
-#### 2.1.10. User experience design
+### 3.3. Project Highlights
 
-## 3. Evaluation
-
-### 3.X. Enhanced Targeting algorithm
+### 3.4. Enhanced Targeting algorithm
 
 ![Screenshot 1](https://maria-kang.com/photos/adaship/Screenshot-2021-03-12-1.png)
 ![Screenshot 2](https://maria-kang.com/photos/adaship/Screenshot-2021-03-12-2.png)
+
+### 3.5. Reflective Review
