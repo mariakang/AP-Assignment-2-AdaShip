@@ -46,6 +46,7 @@ The user is told whether their shot was a ‘hit’ or a ‘miss’, and an upda
 
 ![Screenshot 10](https://maria-kang.com/photos/adaship/Screenshot-2021-03-11-10.png)
 
+
 **Game end**
 
 When a player sinks the last of their opponent’s boats, they immediately become the winner, and the game ends.
@@ -109,11 +110,11 @@ On the other hand, rendering the hidden mines and switching from a random to an 
 
 The development plan consisted of the following high level tasks, or 'epics':
 
- - [Object-orientated design](#22-object-orientated-design)
- - [Ship Placement and Torpedo Algorithms](#23-ship-placement-and-torpedo-algorithms)
- - [Parsing the Configuration File](#24-parsing-the-configuration-file)
- - [User Interface Implementation](#25-user-interface-implementation)
- - [Additional Features](#26-additional-features)
+ - [Object-orientated design] (#22-object-orientated-design)
+ - [Ship Placement and Torpedo Algorithms] (#23-ship-placement-and-torpedo-algorithms)
+ - [Parsing the Configuration File] (#24-parsing-the-configuration-file)
+ - [User Interface Implementation] (#25-user-interface-implementation)
+ - [Additional Features] (#26-additional-features)
 
 Each of these stages are described in more detail below.
 
@@ -155,6 +156,8 @@ Separating out the implementation into ‘.cpp’ files and keeping the content 
 
 #### 2.1.5. Code reuse
 
+Copying large sections of code should be avoided wherever possible by extracting them into reusable functions. Apart from taking up less space and making the code easier to read, this makes it much easier to maintain the code by ensuring that future changes only need to be made in one place instead of many. It also makes it easier for any new features wishing to use it. 
+
 ### 2.2. Object-orientated Design
 
 Using an object-orientated approach to design, the project was modelled as a collection of individual elements, each of which would be written as a class. Each class consists of members; attribute members or fields containing data, and function members or methods responsible for providing a specific area of functionality.
@@ -166,7 +169,9 @@ The first phase of development involved sketching out the class architecture by 
 
 After sketching out an initial design, the classes were coded up in a minimal way (to enable the next stage of algorithm design and implementation to begin) and then continuously updated and amended throughout the development process as their requirements became clearer. Additional classes were also created as part of various refactoring exercises (for example creating a separate `CoordinateConverter` class), making the overall object-orientated design an iterative process.
 
-Once all of the functionality had been implemented and tested, an internal 'tidy up' operation was carried out. This involved taking each class in turn and doing the following:
+I used the `main.cpp` file to write temporary tests during the early stages of development, so as to ensure that the classes and members were behaving as expected. Being new to C++, I found this immensely helpful, as it enabled me to verify that my theoretical solution worked in practice. It also helped me to understand a lot of new concepts, such as when to use object references instead of values, when to overload the assignment operator, and the consequences of not doing so.
+
+At the end of the project, once all of the functionality had been implemented and tested, an internal 'tidy up' operation was carried out. This involved taking each class in turn and doing the following:
  - Removing any unused class members
  - Making each member private unless used by another class
  - Adding formal documentation above the declaration of each member
@@ -208,6 +213,12 @@ Global variables can be altered by any part of the code, making it difficult to 
 The main issue with global and static instances of classes is that the order in which they are constructed and destroyed depends on the implementation. This means that if the code relies on them being around at a certain time, this may lead to unexpected behaviour. Static classes act frequently as a global state and lead to non-deterministic behaviour which should be avoided. Also, code which uses static classes cannot be tested in isolation, making unit testing very difficult.
 
 #### 3.2.3. Member visibility
+
+Class members should always be given the minimum visibility necessary. If a member is public, then it means other classes could depend on it, therefore introducing a maintenance obligation. If the member is only part of the internal implementation of the class's public API, then it should be hidden from external view. This concept, known as information hiding or encapsulation, is fundamental to software design.
+
+Encapsulation results in decoupled modules which can be developed, tested and optimised in isolation. This speeds up system development as independent modules can be developed in parallel. It also reduces the number of regression tests which need to be maintained, as only the behaviour of the public API needs to be verified; anything else is an implementation detail which can be modified without any unexpected consequences.
+
+Therefore all class members were made private unless explicitly referenced by another class. Also, all attribute members were made private so as to protect their integrity. Getter methods were provided where necessary to allow external classes read-only access, and setter methods were provided under rarer circumstances, only if necessary. 
 
 #### 3.2.4. Defensive programming
 
