@@ -46,7 +46,6 @@ The user is told whether their shot was a ‘hit’ or a ‘miss’, and an upda
 
 ![Screenshot 10](https://maria-kang.com/photos/adaship/Screenshot-2021-03-11-10.png)
 
-
 **Game end**
 
 When a player sinks the last of their opponent’s boats, they immediately become the winner, and the game ends.
@@ -110,11 +109,11 @@ On the other hand, rendering the hidden mines and switching from a random to an 
 
 The development plan consisted of the following high level tasks, or 'epics':
 
- - [Object-orientated design] (#22-object-orientated-design)
- - [Ship Placement and Torpedo Algorithms] (#23-ship-placement-and-torpedo-algorithms)
- - [Parsing the Configuration File] (#24-parsing-the-configuration-file)
- - [User Interface Implementation] (#25-user-interface-implementation)
- - [Additional Features] (#26-additional-features)
+ - [Object-orientated design](#22-object-orientated-design)
+ - [Ship Placement and Torpedo Algorithms](#23-ship-placement-and-torpedo-algorithms)
+ - [Parsing the Configuration File](#24-parsing-the-configuration-file)
+ - [User Interface Implementation](#25-user-interface-implementation)
+ - [Additional Features](#26-additional-features)
 
 Each of these stages are described in more detail below.
 
@@ -221,6 +220,26 @@ Encapsulation results in decoupled modules which can be developed, tested and op
 Therefore all class members were made private unless explicitly referenced by another class. Also, all attribute members were made private so as to protect their integrity. Getter methods were provided where necessary to allow external classes read-only access, and setter methods were provided under rarer circumstances, only if necessary. 
 
 #### 3.2.4. Defensive programming
+
+Defensive programming is a technique used to make software behave in a predictable manner despite unexpected inputs or user actions. It involves minimising the number of assumptions made about the inputs received, and using guard statements to ensure that invalid inputs are handled gracefully.
+
+AdaShip is an interactive game which relies on user input. Furthermore, since it is not possible to restrict what users can enter via the console-based UI, it is particularly important to check and validate the input before attempting to process it.
+
+In some cases, the potential for error has been minimised by making it clear what the default behaviour will be, for example, '_(Enter 'y' or the board will be shown)_'. However in most cases, when user input is requested, the program will loop until valid input has been received. The input is validated, and if valid, it's processed and the loop is broken. Otherwise, a message is displayed to the user, and another loop begun.
+
+Examples of input requiring this form of validation include:
+- Main menu options
+- Boat position requests
+- Torpedo targets
+- Experiment repetitions
+
+The configuration file is also a potential source of error, though this is treated slightly differently. Instead of expecting the user to edit the file while the program is running, and looping until they do, the program simply outputs a message to say that there's an issue with it, and exits, giving the user a chance to fix the file offline.
+
+Although user input is validated to ensure that errors are detected and handled gracefully, some user errors are predictable and therefore silently corrected to enhance the user's experience. Examples include:
+- Making string comparisons case-insensitive
+- Ignoring the rest of the string if the first part is valid
+- Ignoring additional whitespace
+- Handling some extra or missing whitespace in the configuration file
 
 #### 3.2.5. User experience design
 
