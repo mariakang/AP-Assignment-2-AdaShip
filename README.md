@@ -102,7 +102,7 @@ As mentioned above, when the user selects a ‘one player v computer’ game, th
 
 Furthermore, the main menu contains an option ‘Run experiment (random selection v targeting algorithm)’. When this option is selected, the user is prompted to enter the number of repetitions to use, and then for each repetition, a random boat configuration is set up, and the number of shots required to sink all of the ships using first random selection and then the targeting algorithm are output to the console. The average number of shots taken by each algorithm is displayed at the end.
 
-Details on the implementation of the enhanced targeting algorithm are given below in section 3.
+Details on the implementation of the enhanced targeting algorithm are given below in [section 3.4](#34-enhanced-targeting-algorithm).
 
 ### 1.3. Flow Diagram
 
@@ -279,7 +279,7 @@ In the program, each time a square is 'hit', its adjacent squares (excluding dia
 
 The program includes the option to run an experiment. For each repetition, boats are randomly placed on a board, and then the number of shots taken to sink all of the boats using the targeting algorithm are compared to the number of shots taken to sink the same configuration of boats using random selection.
 
-Each time I've run the experiment, the targeting algorithm has achieved an average of around 55 shots, compared to the 95 shot average achieved by random selection.
+Each time I've run the experiment with 1,000 repetitions, the targeting algorithm has consistently achieved an average of 55 shots, compared to the 95 shot average achieved by random selection.
 
 ![Screenshot 1](https://maria-kang.com/photos/adaship/Screenshot-2021-03-12-1.png)
 ![Screenshot 2](https://maria-kang.com/photos/adaship/Screenshot-2021-03-12-2.png)
