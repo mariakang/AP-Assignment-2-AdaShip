@@ -46,7 +46,6 @@ The user is told whether their shot was a ‘hit’ or a ‘miss’, and an upda
 
 ![Screenshot 10](https://maria-kang.com/photos/adaship/Screenshot-2021-03-11-10.png)
 
-
 **Game end**
 
 When a player sinks the last of their opponent’s boats, they immediately become the winner, and the game ends.
