@@ -92,11 +92,6 @@ class Boat {
       return damage_;
     }
 
-    /** Resets the number of times the boat has been hit to 0. */
-    void resetDamage() {
-      damage_ = 0;
-    }
-
     /** Returns whether or not the boat has been placed on a board. */
     bool isPlaced() {
       return !start_.isOrigin();
