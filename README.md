@@ -110,11 +110,11 @@ On the other hand, rendering the hidden mines and switching from a random to an 
 
 The development plan consisted of the following high level tasks, or 'epics':
 
- - [Object-orientated design] (#22-object-orientated-design)
- - [Ship Placement and Torpedo Algorithms] (#23-ship-placement-and-torpedo-algorithms)
- - [Parsing the Configuration File] (#24-parsing-the-configuration-file)
- - [User Interface Implementation] (#25-user-interface-implementation)
- - [Additional Features] (#26-additional-features)
+ - [Object-orientated design](#22-object-orientated-design)
+ - [Ship Placement and Torpedo Algorithms](#23-ship-placement-and-torpedo-algorithms)
+ - [Parsing the Configuration File](#24-parsing-the-configuration-file)
+ - [User Interface Implementation](#25-user-interface-implementation)
+ - [Additional Features](#26-additional-features)
 
 Each of these stages are described in more detail below.
 
