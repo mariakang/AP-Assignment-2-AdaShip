@@ -87,11 +87,6 @@ class Player {
       survivingBoats_--;
     }
 
-    /** Resets the number of surviving boats to the size of the fleet. */
-    void resetSurvivingBoats() {
-      survivingBoats_ = fleet_.size();
-    }
-
     /** Returns the number of torpedoes fired by the player. */
     int shotsTaken() {
       return shotsTaken_;
@@ -131,13 +126,5 @@ class Player {
      */
     void addTarget(Coordinate coordinate) {
       targets_.push(coordinate);
-    }
-
-    /** 
-     * Clears the collection of coordinates which have been deemed priority targets
-     * (to be used by the player's opponent as part of the targeting algorithm).
-     */
-    void clearTargets() {
-      targets_.setSize(0);
     }
 };
