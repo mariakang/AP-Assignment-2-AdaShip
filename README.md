@@ -102,6 +102,22 @@ The following [AdaShip Flow Diagram](https://maria-kang.com/photos/adaship/AdaSh
 
 ### 1.4. Development Plan
 
+The overall development strategy was agile, with an iterative approach to design and implementation, early adoption of testing, and gradual addition of features. However, given the very short timeframe, it was deemed more efficient to 'think ahead' and incorporate some of the more enhanced features into the initial design, as opposed to creating an end-to-end minimum viable product (MVP) and only adding non-essential features once the MVP has been completed.
+
+For example, the 'salvo' and 'hidden mines' modes were taken into consideration from the start when desigining the torpedo firing algorithm, so as to ensure the code would not need to be completely re-written in order to add these features. Also, the board dimensions and boat specifications (including the total number of boats) were assumed to be configurable from the start, as this strongly influenced the overall class design (for example, requiring `Boat` objects and resizable `Fleet` and `Board` objects).
+
+On the other hand, rendering the hidden mines and switching from a random to an enhanced targeting algorithm were features which were added after an initial end-to-end solution had been implemented and tested. Also, testing was carried out at the earliest possible stage during the implementation of each feature. Early testing ensures that any potentially design-altering issues are detected before the creation of large amounts of code which will subsequently need to be rewritten. Also, testing individual elements reduces the number of potential causes of any bugs, thereby making them quicker to diagnose and fix.
+
+The development plan consisted of the following high level tasks, or 'epics':
+
+ - [Object-orientated design] (#22-object-orientated-design)
+ - [Ship Placement and Torpedo Algorithms] (#23-ship-placement-and-torpedo-algorithms)
+ - [Parsing the Configuration File] (#24-parsing-the-configuration-file)
+ - [User Interface Implementation] (#25-user-interface-implementation)
+ - [Additional Features] (#26-additional-features)
+
+Each of these stages are described in more detail below.
+
 ## 2. Development
 
 ### 2.1. Adoption of Good Standards
