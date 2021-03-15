@@ -19,7 +19,10 @@ The user is presented with a menu and asked to select an option.
 
 #### 1.2.1. One player v computer
 
-This is a two player game in which the first player is the user, and the second player is the computer. The game has three main phases: ‘setup’, ‘turn sequence’, and ‘game end’.
+This is a two player game in which the first player is the user, and the second player is the computer. The game has three main phases:
+ - Setup
+ - Turn sequence
+ - Game end
 
 **Setup**
 
@@ -76,7 +79,15 @@ During gameplay, if a torpedo is fired at a square containing a mine, then as we
 
 #### 1.2.5. Customisation
 
-The standard board size is 10 x 10, and the standard collection of boats is: Carrier (length: 5), Battleship (length: 4), Destroyer (length: 3), Submarine (length: 3) and Patrol Boat (length: 2). However, users can customise the configuration by specifying their preferences in the ‘adaship_config.ini’ file.
+The standard board size is 10 x 10, and the standard collection of boats is:
+ - Carrier (length: 5)
+ - Battleship (length: 4)
+ - Destroyer (length: 3)
+ - Submarine (length: 3)
+ - Patrol Boat (length: 2)
+
+However, users can customise the configuration by specifying their preferences in the ‘adaship_config.ini’ file.
+
 The program supports three types of customisation: board dimensions (up to a maximum 80 x 80), boats (up to a maximum of 80), and the number of hidden mines to use.
 
 ![Screenshot 15](https://maria-kang.com/photos/adaship/Screenshot-2021-03-11-15.png)
@@ -197,7 +208,7 @@ For further details on the behaviour and purpose of each class and member, pleas
 
 #### 3.2.1. Class architecture
 
-When designing my object orientated solution to the problem, I attempted to separate out different types of functionality into different classes. For example, classes such as `BoardSquare` and `Boat` are models which store information about an element of the game, whereas `BoardPrinter` and `BoatPlacer` are concerned with printing output to the console and implementing logic to update the model classes respectively.
+When designing my object orientated solution to the problem, I attempted to separate out different types of functionality into different classes ('separation of concerns'). For example, classes such as `BoardSquare` and `Boat` are models which store information about an element of the game, whereas `BoardPrinter` and `BoatPlacer` are concerned with printing output to the console and implementing logic to update the model classes respectively.
 
 Strictly speaking, my implementation doesn’t fit into a Model-View-Controller (MVC) framework, as the lines between view and controller are a little blurred. For example, the `GameController` class handles input and output, but also controls the flow of events. However, each class has been designed to perform a specific type of function, making it reasonably easy to identify which class is responsible for what.
 
@@ -245,7 +256,7 @@ Although user input is validated to ensure that errors are detected and handled 
 
 Care was taken to design a user interface which would be intuitive, easy and satisfying to use. This involved making instructions as clear as possible (for example by including sample input or 'greying out' placed boats), minimising the number of required interactions or key presses (for example by using 'Enter' for likely defaults), and trying to make the rendered boards aestheitcally pleasing (for example using colours).
 
-As mentioned above, some predictable user errors (such as case) are silently corrected so as to spare the user from doing any extra work.
+As mentioned above, some predictable user errors (such as case) are silently corrected so as to spare the user from doing any unnecessary extra work.
 
 ### 3.3. Project Highlights
 
@@ -257,8 +268,27 @@ As mentioned above, some predictable user errors (such as case) are silently cor
 
 ### 3.4. Enhanced Targeting algorithm
 
+As described above, the program includes an enhanced targeting algorithm for seeking out boats. The algorithm has two main components:
+ - **Prioritising squares adjacent to 'hits'**
+In the classic game of battleships, if a square is hit, then unless the boat occupying it is of length 1 (which isn't the case in the standard setup), it means at least one of the adjacent squares must also contain a boat. It therefore makes sense to aim the next torpedo at one of these adjacent squares.
+
+ - **Calculating probability densities**
+In essence, this involves calculating the relative probability of each square containing a boat, and then picking a square with the highest probability. For each boat, we iterate over the board, determining whether or not the boat can be placed there vertically or horizontally and (for each orientation) if it can, each square that it would occupy is given an additional probability weighting. 
+
+In the program, each time a square is 'hit', its adjacent squares (excluding diagonals and looking only within the boundaries of the board) are added to a stack of prioritised `targets_`. When the targeting algorithm is invoked, if the stack is non-empty, then items are popped off it until one which hasn't already been torpedoed is found, or the stack is empty. In the former case, the target in question is chosen. In the latter case, the probability density of each square is recalculated, and one with the highest probability is chosen as the target.
+
+The program includes the option to run an experiment. For each repetition, boats are randomly placed on a board, and then the number of shots taken to sink all of the boats using the targeting algorithm are compared to the number of shots taken to sink the same configuration of boats using random selection.
+
+Each time I've run the experiment, the targeting algorithm has achieved an average of around 55 shots, compared to the 95 shot average achieved by random selection.
+
 ![Screenshot 1](https://maria-kang.com/photos/adaship/Screenshot-2021-03-12-1.png)
 ![Screenshot 2](https://maria-kang.com/photos/adaship/Screenshot-2021-03-12-2.png)
+
+As evidenced above, the targeting algorithm performs consistently better than random selection. However, it isn't as 'smart' as it could be.
+
+In most standard versions of battleships, a player isn't told when an opponent's boat has been sunk. Since clustering boats together can be a valid obfuscation strategy, it would usually make sense for a player to check all adjacent targets before moving on. However, in AdaShip, players are notified whenever they sink an opponent's boat (including which boat it is), therefore making it possible to make further deductions regarding the potential positions of remaining boats.
+
+In the interests of simplicity (and time!) this has not been taken into consideration when designing the algorithm. For example, prioritised targets are never removed from the stack without being torpedoed (unless they've already been torpedoed). Also, although it may be technically possible deduce that a previously 'hit' square cannot contain part of a surviving boat, this is not taken into consideration when calculating relative probabilities (only 'misses' or board boundaries may prevent a boat from potentially being positioned in a given location).
 
 ### 3.5. Reflective Review
 
