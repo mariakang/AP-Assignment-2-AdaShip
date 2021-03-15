@@ -1,7 +1,7 @@
 # AdaShip
 by Maria Kang
 
-A live instance of this project is available on [Repl.it](https://repl.it/@mariakang/AdaShip)
+A live instance of this project is available on [Repl.it](https://repl.it/@mariakang/AP-Assignment-2-AdaShip)
 
 ## 1. Challenge Outline
 
