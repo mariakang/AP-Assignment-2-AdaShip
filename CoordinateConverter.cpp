@@ -28,9 +28,12 @@ void CoordinateConverter::initialiseLookup() {
 string CoordinateConverter::columnToString(int column) {
   const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   string alpha = "";
+  // if the number is above 26, then an additional character (representing the
+  // integer quotient when divided by 26) is prepended
   if (column > 26) {
     alpha += alphabet[(column - 1) / 26 - 1];
   }
+  // the final character represents the remainder when divided by 26
   alpha += alphabet[(column - 1) % 26];
   return alpha;
 }

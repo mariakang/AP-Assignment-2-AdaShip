@@ -351,6 +351,44 @@ As mentioned above, some predictable user errors (such as case) are silently cor
 ### 3.2. Project Highlights
  
 #### 3.2.1. Coordinate conversion
+Throughout the program, there are instances when a grid reference in the form ‘A1’, ‘B2’ etc. needs to be converted into a coordinate.
+ 
+One option could have been to store the board squares as a 1-dimensional map, mapping string references to `BoardSquare` objects. However, I felt that this approach would make the code harder to follow when it came to iterating over the board, or dealing with squares on neighbouring rows and columns. I felt it would be easier to follow if the rows and columns were expressed as integers, and the `BoardSquare` objects stored in a 2-dimensional array.
+ 
+Therefore, in order to switch between the two, I created a `CoordinateConverter` class with methods to convert strings into coordinates, coordinates to strings, and validate whether or not a coordinate lies within the board’s boundaries. These methods can be called by any function wishing to use them.
+ 
+The conversion process essentially works by using an algorithm to convert column numbers to Excel-style column headings, and populating a lookup map which can then be used to get the column number from its Excel-style column heading.
+ 
+```
+/** Populates the mapping from Excel-style column names to column numbers. */
+void CoordinateConverter::initialiseLookup() {
+ // populate an 'alpha to column number' lookup map
+ for (int i = 1; i <= columns_; i++) {
+   alphaLookup_[columnToString(i)] = i;
+ }
+}
+ 
+/** Converts the given column number to its Excel-style representation. */
+string CoordinateConverter::columnToString(int column) {
+ const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+ string alpha = "";
+ // if the number is above 26, then an additional character (representing the
+ // integer quotient when divided by 26) is prepended
+ if (column > 26) {
+   alpha += alphabet[(column - 1) / 26 - 1];
+ }
+ // the final character represents the remainder when divided by 26
+ alpha += alphabet[(column - 1) % 26];
+ return alpha;
+} 
+```
+Note: Board rows and columns start at 1, whereas the `alphabet` string is 0-based.
+
+Only the columns in the board’s range (as specified by the configuration file) are added to the map, and as all of these strings will be required by the board printing algorithm, no unnecessary mappings are added. Also, as this map is populated when the class is constructed, it means that the calculations (which have a time complexity of O(n)) only need to be performed once, as opposed to every time a method is called. The time complexity of looking up a value from the map is only O(1).
+ 
+Since the function which converts a string into a coordinate needed to return a single object, I created a `Coordinate` class. This class simply provides a convenient way of grouping a row and column number together. I could have opted to add a `toString()` method on it, but I felt that a lookup map would be the most efficient way of performing this conversion, and it would have been inefficient to have to initialise this each time the function is called, or each time a `Coordinate` object is created.
+ 
+Since reference strings entered by the user may or may not be valid, defensive programming has been used to check the validity of the string when trying to convert it to a coordinate. If the string is invalid, the function will return (0, 0), and as this isn’t a valid board coordinate, it will be easy for the function calling it to determine whether or not the string was valid. This was easier to work with than making the function throw an error.
  
 #### 3.2.2. Boat placing algorithm
  
