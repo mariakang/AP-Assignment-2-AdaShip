@@ -33,6 +33,9 @@ At the start of the game, the user is shown an empty game board and a list of bo
 ![Screenshot 3](https://maria-kang.com/photos/adaship/Screenshot-2021-03-11-3.png)
  
 If they select a boat which has already been placed, then it will be moved to the new position. If the boat cannot be placed in the location specified, then the user will be notified and asked to choose again.
+
+![Screenshot 4](https://maria-kang.com/photos/adaship/Screenshot-2021-03-11-4.png)
+
 Once all of their boats have been placed, the user is free to reposition them or reset the board as many times as they wish, until they hit ‘Enter’ to confirm the configuration. The computer will then automatically (randomly) place its own boats on its own board.
  
 ![Screenshot 6](https://maria-kang.com/photos/adaship/Screenshot-2021-03-11-6.png)
@@ -71,7 +74,7 @@ If the user enters too many targets, then the remainder above the permitted numb
  
 In this variation of the game, once a player has confirmed their boat configuration at the end of the setup phase, a number of ‘hidden mines’ are automatically placed on their board in random locations. Each mine takes up one square, and whilst it cannot be placed in a square occupied by another mine, it may be placed in a square occupied by a boat.
  
-![Screenshot 13](https://maria-kang.com/photos/adaship/Screenshot-2021-03-11-13.png)
+![Screenshot 5](https://maria-kang.com/photos/adaship/Screenshot-2021-03-11-5.png)
  
 During gameplay, if a torpedo is fired at a square containing a mine, then as well as the square itself being torpedoed, the 8 squares immediately surrounding it will ‘explode’. If any of the surrounding squares contain mines, then the squares immediately surrounding that mine will also explode, and so on.
  
