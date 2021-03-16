@@ -11,7 +11,7 @@ using namespace std;
 CoordinateConverter::CoordinateConverter(int rows, int columns) {
   // set number of rows and columns
   rows_ = rows;
-  columns_ = rows;
+  columns_ = columns;
   // populate an 'alpha to column number' lookup map
   initialiseLookup();
 }
