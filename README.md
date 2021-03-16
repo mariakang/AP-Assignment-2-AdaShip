@@ -226,7 +226,7 @@ Each of these algorithms could also be built up in layers. For example, for the 
  
 I tested as early as possible, writing temporary basic tests which just ran parts of the code and printed some output to the console. The main purpose of these was to be able to check that the code compiled, enabling me to address any syntax and compilation issues early on. They also helped to verify that certain aspects were working as expected (for example the coordinate conversion functions).
  
-However, without having created any of the UI components which would be necessary to test these algorithms properly, by the end of this phase, the code was only considered to be of prototype quality.
+However, without having created any of the UI components which would be necessary to test these algorithms properly, by the end of this phase, the code was only of prototype quality.
  
 The ‘hidden mines’ variant of the game was factored into the initial design of the torpedo firing algorithm. However, the enhanced targeting algorithm was deemed out of scope for this phase, and scheduled to be done after an end-to-end MVP had been produced, if time permitted. The option to reset the board during the boat setup phase was also added at a later stage.
  
@@ -240,6 +240,7 @@ The next phase of development involved dealing with the configuration file. Task
 The first iteration of this implementation involved making some strong assumptions about the structure of the user-provided configuration file. For example, it was assumed that the first line would contain the board dimensions, and each subsequent line would contain a boat specification. It was also assumed that each colon would be followed by a space.
  
 These assumptions resulted in a code smell. My code treated the first line differently to the rest of the lines which - apart from looking a bit nasty - felt fragile and unable to withstand minor changes to the format of the config file. Treating the rest of the lines as boats was also a foolish assumption which failed to take account of potential blank lines, and left insufficient flexibility to add new categories in future (such as the number of mines, which was added in a later phase).
+
 The code was therefore refactored to dynamically check which category (if any) each line related to before parsing it any further. The treatment of whitespace was also handled more robustly. Some assumptions still remain in place, for example the presence of colons after category headings, and commas after boat names, but I feel these are reasonable.
  
 ### 2.5. User Interface Implementation
@@ -264,9 +265,11 @@ I wrote some simple temporary tests early on to verify that the board printing f
  
 Once all of the above tasks had been completed, I was able to perform more thorough testing by walking through the workflow as a user. Most features worked as expected, though some issues did come to light which needed to be fixed.
  
+**Random number seed**
 The first notable issue was to do with the way random numbers were generated. I’d initially created a reusable function to generate a random number, which also seeded the random number sequence first. This seeding is necessary, but should only be done once, not each time a random number is generated, particularly if the numbers are generated in short succession (since the seeding uses a timestamp). I first noticed this issue when I was testing randomly placing all boats, and spotted that all of the boats always had the same orientation. After looking into it, I realised that it could be fixed by moving the ‘seeding’ part out of the random number function and running it once for the whole program.
  
-Another issue which had to be fixed was the occurrence of ‘segmentation faults’. While manually testing the game sequence, the program would occasionally crash, citing a ‘segmentation fault’. I researched what this meant, but the suggestion that it was somehow related to a memory access issue seemed unlikely, as it was occurring in the middle of the game, at a point similar to a previous one which had gone without a hitch. There wasn’t any obvious debug logging I could add to help diagnose the issue, but after some more research, I hypothesised that it might have something to do with recursion.
+**Segmentation fault**
+Another issue which had to be fixed was the occurrence of ‘segmentation faults’. While manually testing the game sequence, the program would occasionally crash, citing a ‘segmentation fault’. I researched what this meant, but the suggestion that it was somehow related to a memory access issue seemed unlikely, as it was occurring in the middle of the game, while performing an action which had previously been performed without a problem. There wasn’t any obvious debug logging I could add to help diagnose the issue, but after some more research, I hypothesised that it might have something to do with recursion.
  
 I had initially written the turn sequence recursively. The function was called with ‘player’ and ‘opponent’ parameters, and towards the end of it, if no winner had been found, it would make a call to itself with the player and opponent parameters switched around. This meant that the turn sequence would keep alternating between the two players until a winner had been found. However, it occurred to me that perhaps there was a limit on the permitted depth of recursion. I tested this hypothesis by playing the game and counting how many times the recursive function was called before the game crashed. When I discovered that it was consistently crashing after the same number of turns (10), I deduced that this was the cause of the problem, and then rewrote the function to be iterative (using a while loop) instead of recursive. This fixed the problem.
  
