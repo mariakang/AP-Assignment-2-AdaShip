@@ -274,6 +274,18 @@ Another issue which had to be fixed was the occurrence of ‘segmentation faults
 I had initially written the turn sequence recursively. The function was called with ‘player’ and ‘opponent’ parameters, and towards the end of it, if no winner had been found, it would make a call to itself with the player and opponent parameters switched around. This meant that the turn sequence would keep alternating between the two players until a winner had been found. However, it occurred to me that perhaps there was a limit on the permitted depth of recursion. I tested this hypothesis by playing the game and counting how many times the recursive function was called before the game crashed. When I discovered that it was consistently crashing after the same number of turns (10), I deduced that this was the cause of the problem, and then rewrote the function to be iterative (using a while loop) instead of recursive. This fixed the problem.
  
 ### 2.6. Additional Features
+
+Once a fully-functional, end-to-end product had been completed, the final phase (prior to internal tidy up) was to implement some additional features. These include:
+ 
+ - Randomly place ‘hidden mines’ and update the board printer to display them
+ - Implement an enhanced targeting algorithm
+ - Allow the user to increase the difficulty level
+ - Update the computer’s auto-fire logic to use the targeting algorithm if the difficulty has been increased
+ - Add a ‘run experiment’ feature to test the new targeting algorithm
+ - During setup, add the option to ‘reset’ the board
+ - During setup, once all boats have been placed, ask the user to confirm the placement, allowing them to reposition boats until they do
+ 
+Since the UI was already in place, testing these features as they were added was very straightforward. However, special care was taken to try to ensure that the new features weren’t introducing any unexpected regressions. It is impossible to guarantee this with manual testing, which is why in a production environment I’d expect to set up a test harness to run automated regression tests.
  
 ## 3. Evaluation
  
