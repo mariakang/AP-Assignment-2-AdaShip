@@ -306,7 +306,7 @@ When designing my class architecture, I tried to avoid making any classes too bi
  
 #### 3.1.2. Avoiding global variables and static classes
  
-I have used literal constants in my code (e.g. `MAX_ROWS` and `MAX_COLUMNS`) to improve readability, and aid maintenance by ensuring that hard coded values only need to be updated in one place. However, I have chosen to avoid using global variables or static classes.
+I have used preprocessor definitions in my code (e.g. `MAX_ROWS` and `MAX_COLUMNS`) to improve readability, and aid maintenance by ensuring that hard coded values only need to be updated in one place. However, these are not variables; they act merely as a form of text replacement which is performed by the preprocessor before the program is compiled. I have chosen to avoid using global variables or static classes.
  
 Global variables can be altered by any part of the code, making it difficult to remember or understand every possible use. A global variable can have no access control; it cannot be limited to only specific parts of the program. Using global variables causes very tight coupling of code, and testing can be an issue as it is difficult to decouple them when writing tests.
  
@@ -380,7 +380,16 @@ For example, I created a function to print the header rows (column headings and 
 
 I also used parameters to be able to make slight alterations to functions rather than creating multiple versions of the same thing. For example, the only difference between the view of the user's board during setup, and the view of it during gameplay, is the colour coding of the boats key. Therefore it made sense to pass this in as a boolean parameter.
 
-I decided to use literal constants to store formatting strings (colour codes etc.). The strings themselves are difficult to understand, so replacing them with human readable names makes the code much clearer to follow. Also, developing the colour scheme was an iterative process which involved several cycles of testing and 'tweaking'. Using literal constants all defined in one place at the top of the file made it much easier to update. 
+I decided to use preprocessor definitions to store formatting strings (colour codes etc.). The strings themselves are difficult to understand, so replacing them with human readable names makes the code much clearer to follow. Also, developing the colour scheme was an iterative process which involved several cycles of testing and 'tweaking'. Using preprocessor definitions which were all defined in one place at the top of the file made these updates much easier to make.
+
+```
+#define WAVE "\033[34;104m ~ \033[0m"
+#define SPLASH "\033[1;97;104m * \033[0m"
+#define HIT "\033[1;31;100m x \033[0m"
+#define MINE "\033[1;35;104m M \033[0m"
+```
+
+As described [above](#312-avoiding-global-variables-and-static-classes), preprocessor definitions act as a form of text replacement; they are not global variables. 
  
 ### 3.3. Enhanced Targeting algorithm
  
