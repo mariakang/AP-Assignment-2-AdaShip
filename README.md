@@ -351,6 +351,7 @@ As mentioned above, some predictable user errors (such as case) are silently cor
 ### 3.2. Project Highlights
  
 #### 3.2.1. Coordinate conversion
+
 Throughout the program, there are instances when a grid reference in the form ‘A1’, ‘B2’ etc. needs to be converted into a coordinate.
  
 One option could have been to store the board squares as a 1-dimensional map, mapping string references to `BoardSquare` objects. However, I felt that this approach would make the code harder to follow when it came to iterating over the board, or dealing with squares on neighbouring rows and columns. I felt it would be easier to follow if the rows and columns were expressed as integers, and the `BoardSquare` objects stored in a 2-dimensional array.
@@ -382,7 +383,7 @@ string CoordinateConverter::columnToString(int column) {
  return alpha;
 } 
 ```
-Note: Board rows and columns start at 1, whereas the `alphabet` string is 0-based.
+Note: Board rows and columns start at 1, whereas the `alphabet` string is 0-based, hence the use of offsets in the code above.
 
 Only the columns in the board’s range (as specified by the configuration file) are added to the map, and as all of these strings will be required by the board printing algorithm, no unnecessary mappings are added. Also, as this map is populated when the class is constructed, it means that the calculations (which have a time complexity of O(n)) only need to be performed once, as opposed to every time a method is called. The time complexity of looking up a value from the map is only O(1).
  
