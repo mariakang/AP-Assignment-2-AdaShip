@@ -355,6 +355,30 @@ As mentioned above, some predictable user errors (such as case) are silently cor
 #### 3.2.2. Boat placing algorithm
  
 #### 3.2.3. Board rendering
+
+The board rendering is the most prominent feature of the UI, so I tried to make it as aesthetically pleasing and clear as possible.
+
+Key design features include:
+ - Colour coding of squares (including fonts and backgrounds) to make them instantly clear
+ - Use of symbols to add illustration (e.g. ‘~’ to represent a wave and ‘*’ to represent a splash)
+ - Ensuring all squares are exactly the same width, regardless of contents (or column headings), so that the table is consistently aligned
+ - ‘Greying out’ placed boats
+ - Colour coding the boats key to indicate damage (i.e. green for undamaged, orange for hit and red for sunk)
+ - Dynamically positioning the boats key at the side of the board or underneath it, depending on how wide the board is
+ 
+**Screenshots**
+ 
+![Screenshot 3](https://maria-kang.com/photos/adaship/Screenshot-2021-03-11-3.png)
+![Screenshot 1](https://maria-kang.com/photos/adaship/Screenshot-2021-03-16-1.png)
+![Screenshot 5](https://maria-kang.com/photos/adaship/Screenshot-2021-03-11-5.png)
+![Screenshot 2](https://maria-kang.com/photos/adaship/Screenshot-2021-03-16-2.png)
+![Screenshot 9](https://maria-kang.com/photos/adaship/Screenshot-2021-03-11-9.png)
+
+The implementation involved creating two main board printing functions: one for the 'boats' board, and another for the 'targets' board (the opponent's view). Given the obvious overlap between the two, I avoided unnecessary repetition by extracting reusable pieces of code into separate functions.
+
+For example, I created a function to print the header rows (column headings and underline) which was used by both types of board. I also created a separate function to print the boats key, which in turn extracted printing a single line into its own function so that it could also be used in isolation to append lines of the key onto the end of board rows.
+
+I also used parameters to be able to make slight alterations to functions rather than creating multiple versions of the same thing. For example, the only difference between the view of the user's board during setup, and the view of it during gameplay, is the colour coding of the boats key. Therefore it made sense to pass this in as a boolean parameter.
  
 ### 3.3. Enhanced Targeting algorithm
  
