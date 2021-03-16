@@ -392,6 +392,17 @@ Since the function which converts a string into a coordinate needed to return a 
 Since reference strings entered by the user may or may not be valid, defensive programming has been used to check the validity of the string when trying to convert it to a coordinate. If the string is invalid, the function will return (0, 0), and as this isn’t a valid board coordinate, it will be easy for the function calling it to determine whether or not the string was valid. This was easier to work with than making the function throw an error.
  
 #### 3.2.2. Boat placing algorithm
+
+Designing an algorithm to place boats randomly on the board presented a number of challenges:
+
+ - How do you define a boat's position?
+ - How do you randomly pick a coordinate and orientation independently?
+ - How can you check whether or not a coordinate and orientation is valid?
+ - How can you prevent a potential infinite loop if randomly generated positions are invalid?
+
+I answered the first question by creating a `Boat` class which has attributes `start_` (a `Coordinate` object representing the location of its top left most square) and `vertical_` (a boolean stating whether or not the boat is positioned vertically). Placing a `Boat` involves setting its `start_` and `vertical_` attributes, and updating the `boatID_` attributes of the `BoardSquare` objects it occupies to hold its ID (which simply represents its index within the `Player`'s `Fleet` object).
+
+A random number between 0 and 1 is generated to determine the orientation (vertical or horizontal), and if the boat cannot be placed anywhere on the board in this orientation, then it will revert to the other one.
  
 #### 3.2.3. Board rendering
 

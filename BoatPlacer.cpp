@@ -275,37 +275,58 @@ bool BoatPlacer::removeBoat(Player& player, Boat& boat) {
  * Returns whether or not the action was completed successfully.
  */
 bool BoatPlacer::placeBoatRandom(Player& player, int boatId) {
-  // get a random integer between 0 and 1 to determine orientation
-  int orientationPicker = randomNumber(1);
-  // if 0, vertical; if 1, horizontal
-  bool vertical = (orientationPicker == 0);
-
   // get the length of the boat to be placed
   int len = player.getBoat(boatId).length();
   // get the player's board
   Board& board = player.board();
-  // create an array to store the possible starting coordinates
+  // create arrays to store the possible starting coordinates
   // (CoordinateStack provides index access)
-  CoordinateStack possibleCoords; 
+  CoordinateStack possibleCoordsV; 
+  CoordinateStack possibleCoordsH; 
   // iterate over the board squares
   for (int i = 1; i < board.rows(); i++) {
     for (int j = 1; j < board.columns(); j++) {
       Coordinate cij(i, j);
       BoardSquare& squareij = board.getSquare(cij);
-      // if the orientation is vertical and maxBoatLengthVertical
-      // is at least 'len', or the orientation is horizontal and
-      // maxBoatLengthHorizontal is at least 'len', add 'cij' to
-      // 'possibleCoords' and update the size
-      if ((vertical && squareij.maxBoatLengthVertical() >= len)
-          || (!vertical && squareij.maxBoatLengthHorizontal() >= len)) {
-        possibleCoords.push(cij);
+      // if maxBoatLengthVertical is at least 'len', add 'cij' to
+      // 'possibleCoordsV'; 
+      // if maxBoatLengthHorizontal is at least 'len', add 'cij' to
+      // 'possibleCoordsH'
+      if (squareij.maxBoatLengthVertical() >= len) {
+        possibleCoordsV.push(cij);
+      }
+      if (squareij.maxBoatLengthHorizontal() >= len) {
+        possibleCoordsH.push(cij);
       }
     }
   }
-  // randomly select a coordinate from the array
-  int randomIndex = randomNumber(possibleCoords.size() - 1);
-  Coordinate c = possibleCoords.coordAtIndex(randomIndex);
-
+  // initialise the orientation as vertical
+  bool vertical = true;
+  // if there are no possible coordinates for this orientation, change to horizontal
+  if (possibleCoordsV.size() == 0) {
+    vertical = false;
+    // if both sets are empty, return false
+    if (possibleCoordsH.size() == 0) {
+      return false;
+    }
+  // if both sets of possible coordinates are non-empty, randomly select the
+  // orientation
+  } else if (possibleCoordsH.size() > 0) {
+    // get a random integer between 0 and 1 to determine orientation
+    int orientationPicker = randomNumber(1);
+    // if 0, vertical; if 1, horizontal
+    vertical = (orientationPicker == 0);
+  }
+  // pick a coordinate
+  int randomIndex = -1;
+  Coordinate c;
+  if (vertical) {
+    randomIndex = randomNumber(possibleCoordsV.size() - 1);
+    c = possibleCoordsV.coordAtIndex(randomIndex);
+  } else {
+    randomIndex = randomNumber(possibleCoordsH.size() - 1);
+    c = possibleCoordsH.coordAtIndex(randomIndex);
+  }
   // place the boat at this coordinate using the chosen orientation
   return placeBoat(player, boatId, c, vertical);
 }
