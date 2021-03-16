@@ -398,11 +398,15 @@ Designing an algorithm to place boats randomly on the board presented a number o
  - How do you define a boat's position?
  - How do you randomly pick a coordinate and orientation independently?
  - How can you check whether or not a coordinate and orientation is valid?
- - How can you prevent a potential infinite loop if randomly generated positions are invalid?
+ - How can you prevent an infinite loop if randomly generated positions are invalid?
 
 I answered the first question by creating a `Boat` class which has attributes `start_` (a `Coordinate` object representing the location of its top left most square) and `vertical_` (a boolean stating whether or not the boat is positioned vertically). Placing a `Boat` involves setting its `start_` and `vertical_` attributes, and updating the `boatID_` attributes of the `BoardSquare` objects it occupies to hold its ID (which simply represents its index within the `Player`'s `Fleet` object).
 
-A random number between 0 and 1 is generated to determine the orientation (vertical or horizontal), and if the boat cannot be placed anywhere on the board in this orientation, then it will revert to the other one.
+A random number between 0 and 1 is generated to determine the orientation (vertical or horizontal), and if the boat cannot be placed anywhere on the board in this orientation, then it will revert to the other one. But how can we tell if it can be placed there?
+
+If we created an algorithm which picked a random coordinate, checked if the boat could be placed there, and then either placed the boat there or looped again to try another coordinate and kept looping until a valid one was found, we'd have no guarantee that this loop would ever terminate. Also, at each iteration, we'd have to perform some complex logic to determine whether or not the placement was possible, which would involve iterating over several squares and would potentially end up being repeated several times (or even infinitely).
+
+To prevent the possibility of creating an infinite loop, I chose to use a methodology which restricted the potential coordinates to only valid ones in the first place.
  
 #### 3.2.3. Board rendering
 
