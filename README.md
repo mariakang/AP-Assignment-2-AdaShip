@@ -102,7 +102,7 @@ As mentioned above, when the user selects a ‘one player v computer’ game, th
  
 Furthermore, the main menu contains an option ‘Run experiment (random selection v targeting algorithm)’. When this option is selected, the user is prompted to enter the number of repetitions to use, and then for each repetition, a random boat configuration is set up, and the number of shots required to sink all of the boats using first random selection and then the targeting algorithm are output to the console. The average number of shots taken by each algorithm is displayed at the end.
  
-Details on the implementation of the enhanced targeting algorithm are given below in [section 3.4](#34-enhanced-targeting-algorithm).
+Details on the implementation of the enhanced targeting algorithm are given below in [section 3.3](#33-enhanced-targeting-algorithm).
  
 ### 1.3. Flow Diagram
  
@@ -289,11 +289,9 @@ Since the UI was already in place, testing these features as they were added was
  
 ## 3. Evaluation
  
-### 3.1. Code Refactoring
+### 3.1. Advanced Programming Techniques
  
-### 3.2. Advanced Programming Techniques
- 
-#### 3.2.1. Class architecture
+#### 3.1.1. Class architecture
  
 When designing my object orientated solution to the problem, I attempted to separate out different types of functionality into different classes ('separation of concerns'). For example, classes such as `BoardSquare` and `Boat` are models which store information about an element of the game, whereas `BoardPrinter` and `BoatPlacer` are concerned with printing output to the console and implementing logic to update the model classes respectively.
  
@@ -301,7 +299,7 @@ Strictly speaking, my implementation doesn’t fit into a Model-View-Controller 
  
 When designing my class architecture, I tried to avoid making any classes too big or too small. If a class is allowed to become too big then it will be a burden to maintain, and similarly a large collection of very small classes is harder to maintain than a smaller collection of slightly larger ones. The `GameController` class originally handled the logic for placing boats and firing torpedoes, but these tasks were later delegated to `BoatPlacer` and `TorpedoLauncher` classes to make these easier to read and maintain. A future enhancement could be to refactor this further to separate out everything UI-related into a separate class.
  
-#### 3.2.2. Avoiding global variables and static classes
+#### 3.1.2. Avoiding global variables and static classes
  
 I have used literal constants in my code (e.g. `MAX_ROWS` and `MAX_COLUMNS`) to improve readability, and aid maintenance by ensuring that hard coded values only need to be updated in one place. However, I have chosen to avoid using global variables or static classes.
  
@@ -309,7 +307,7 @@ Global variables can be altered by any part of the code, making it difficult to 
  
 The main issue with global and static instances of classes is that the order in which they are constructed and destroyed depends on the implementation. This means that if the code relies on them being around at a certain time, this may lead to unexpected behaviour. Static classes act frequently as a global state and lead to non-deterministic behaviour which should be avoided. Also, code which uses static classes cannot be tested in isolation, making unit testing very difficult.
  
-#### 3.2.3. Member visibility
+#### 3.1.3. Member visibility
  
 Class members should always be given the minimum visibility necessary. If a member is public, then it means other classes could depend on it, therefore introducing a maintenance obligation. If the member is only part of the internal implementation of the class's public API, then it should be hidden from external view. This concept, known as information hiding or encapsulation, is fundamental to software design.
  
@@ -317,7 +315,7 @@ Encapsulation results in decoupled modules which can be developed, tested and op
  
 Therefore all class members were made private unless explicitly referenced by another class. Also, all attribute members were made private so as to protect their integrity. Getter methods were provided where necessary to allow external classes read-only access, and setter methods were provided under rarer circumstances, only if necessary.
  
-#### 3.2.4. Defensive programming
+#### 3.1.4. Defensive programming
  
 Defensive programming is a technique used to make software behave in a predictable manner despite unexpected inputs or user actions. It involves minimising the number of assumptions made about the inputs received, and using guard statements to ensure that invalid inputs are handled gracefully.
  
@@ -339,21 +337,21 @@ Although user input is validated to ensure that errors are detected and handled 
 - Ignoring additional whitespace
 - Handling some extra or missing whitespace in the configuration file
  
-#### 3.2.5. User experience design
+#### 3.1.5. User experience design
  
 Care was taken to design a user interface which would be intuitive, easy and satisfying to use. This involved making instructions as clear as possible (for example by including sample input or 'greying out' placed boats), minimising the number of required interactions or key presses (for example by using 'Enter' for likely defaults), and trying to make the rendered boards aesthetically pleasing (for example using colours).
  
 As mentioned above, some predictable user errors (such as case) are silently corrected so as to spare the user from doing any unnecessary extra work. Also, short pauses were added to improve the game flow by giving the user a chance to read whatever has just been output to the console.
  
-### 3.3. Project Highlights
+### 3.2. Project Highlights
  
-#### 3.3.1. Coordinate conversion
+#### 3.2.1. Coordinate conversion
  
-#### 3.3.2. Boat placing algorithm
+#### 3.2.2. Boat placing algorithm
  
-#### 3.3.3. Board rendering
+#### 3.2.3. Board rendering
  
-### 3.4. Enhanced Targeting algorithm
+### 3.3. Enhanced Targeting algorithm
  
 As described above, the program includes an enhanced targeting algorithm for seeking out boats. The algorithm has two main components:
 - **Prioritising squares adjacent to 'hits'**
@@ -377,13 +375,13 @@ In most standard versions of battleships, a player isn't told when an opponent's
  
 In the interests of simplicity (and time!) this has not been taken into consideration when designing the algorithm. For example, prioritised targets are never removed from the stack without being torpedoed (unless they've already been torpedoed). Also, although it may be technically possible to deduce that a previously 'hit' square cannot contain part of a surviving boat, this is not taken into consideration when calculating relative probabilities (only 'misses' or board boundaries may prevent a boat from potentially being positioned in a given location).
  
-### 3.5. Reflective Review
+### 3.4. Reflective Review
  
-#### 3.5.1. Summary
+#### 3.4.1. Summary
  
 Given the short timeframe and my own lack of experience with the language, I'm pleased with the final product. There are undoubtedly areas for improvement, for example separating out the UI from the logic which handles events, and refactoring the random number generation, but in general, I believe the program works as intended and the code is readable with clear documentation.
  
-#### 3.5.2. Enhanced testing
+#### 3.4.2. Enhanced testing
  
 The main area of weakness is testing. Manual tests were carried out as early as possible at all stages of development, and a number of issues fixed as a result. However, automated tests were out of scope, and exhaustive stress testing wasn't possible within the given timeframe.
  
@@ -391,6 +389,6 @@ In a production environment, it would be essential to write unit tests to verify
  
 Manual stress testing should also form part of the standard quality assurance (QA) process. QA testing involves performing deliberately intense and thorough tests to see if it's possible for a user to break the program. While a lot of manual testing was carried out, it wasn't feasible to stress test every possible scenario and edge case, making it impossible to rule out the presence of bugs.
  
-#### 3.5.3. Continued professional development
+#### 3.4.3. Continued professional development
  
 During the development of this project, I learnt a lot about C++ and object-orientated programming. However, I feel I've only just scratched the surface and there's a lot more to learn. For example, there are a lot of standard data structures (sets, deques, lists etc.) which I might have used if I'd been implementing this in another language, but which I'm unfamiliar with in a C++ context. I'd therefore be very interested to learn which data structures professional C++ developers would use in various scenarios and why.
