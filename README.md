@@ -396,17 +396,23 @@ Since reference strings entered by the user may or may not be valid, defensive p
 Designing an algorithm to place boats randomly on the board presented a number of challenges:
 
  - How do you define a boat's position?
- - How do you randomly pick a coordinate and orientation independently?
+ - How do you randomly pick a coordinate and orientation?
  - How can you check whether or not a coordinate and orientation is valid?
  - How can you prevent an infinite loop if randomly generated positions are invalid?
 
 I answered the first question by creating a `Boat` class which has attributes `start_` (a `Coordinate` object representing the location of its top left most square) and `vertical_` (a boolean stating whether or not the boat is positioned vertically). Placing a `Boat` involves setting its `start_` and `vertical_` attributes, and updating the `boatID_` attributes of the `BoardSquare` objects it occupies to hold its ID (which simply represents its index within the `Player`'s `Fleet` object).
 
-A random number between 0 and 1 is generated to determine the orientation (vertical or horizontal), and if the boat cannot be placed anywhere on the board in this orientation, then it will revert to the other one. But how can we tell if it can be placed there?
+A random number can be generated to pick an orientation, and then another to pick a coordinate independently. However, not every possible combination of starting coordinate and orientation will work, for example if it caused part of the boat to lie outside the board, or overlap with another boat.
 
-If we created an algorithm which picked a random coordinate, checked if the boat could be placed there, and then either placed the boat there or looped again to try another coordinate and kept looping until a valid one was found, we'd have no guarantee that this loop would ever terminate. Also, at each iteration, we'd have to perform some complex logic to determine whether or not the placement was possible, which would involve iterating over several squares and would potentially end up being repeated several times (or even infinitely).
+We could create an algorithm which picked a random coordinate and orientation, checked if the boat could be placed there, and then either placed the boat there or looped again to try another coordinate and orientation, and kept looping until a valid combination was found. However, we'd have no guarantee that this loop would ever terminate. Also, at each iteration, we'd have to perform some complex logic to determine whether or not the placement was possible, which would involve iterating over several squares each time, and would potentially end up being repeated several times (or even infinitely).
 
-To prevent the possibility of creating an infinite loop, I chose to use a methodology which restricted the potential coordinates to only valid ones in the first place.
+To prevent the possibility of creating an infinite loop, I chose to use a methodology which restricts the choice of coordinate-orientation combination to only valid ones in the first place.
+
+When it's time to randomly select a coordinate and orientation, the algorithm loops over the board and lists the possible starting coordinates that could be chosen for each orientation (by comparing the length of the boat against the stored maximum boat length for each orientation). If there are no possible coordinates for both orientations, then the algorithm exists. If there are no possible coordinates for one orientation, then the other orientation is chosen. Otherwise, a random integer between 0 and 1 is generated to determine the orientation. Then, taking the list of possible coordinates for this orientation, a random number is generated to select an index, and the coordinate at this index in the list is chosen.
+
+The selection algorithm has to iterate over the entire board each time, giving it a time complexity of `O(n)` (where `n` is the number of board squares). However, it only needs to read the data stored in each square; it doesn't need to iterate over any other squares to check if the position is valid (which would increase the time complexity). It also only has to iterate once; there is no risk of creating an infinite loop. The trade off is the fact that additional logic has to be performed each time a boat is placed or removed (to update the maximum boat lengths), but I feel that on balance, this is a price worth paying.
+
+The algorithm could be improved by maintaining a map linking boat lengths to the sets of possible coordinates (and orientations). This would reduce the time complexity of the random selection to `O(1)`, but would increase the space complexity. I would like to research how to implement such a data structure in C++, but given the limited time and the fact that the board will never become very large, I felt my approach would suffice.
  
 #### 3.2.3. Board rendering
 
