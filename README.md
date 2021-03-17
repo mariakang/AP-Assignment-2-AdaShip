@@ -38,7 +38,7 @@ A live instance of this project is available on [Repl.it](https://repl.it/@maria
     - [3.2.1. Coordinate conversion](#321-coordinate-conversion)
     - [3.2.2. Boat placing algorithm](#322-boat-placing-algorithm)
     - [3.2.3. Board rendering](#323-board-rendering)
-  - [3.3. Enhanced Targeting algorithm](#-33-enhanced-targeting-algorithm)
+  - [3.3. Enhanced Targeting Algorithm](#-33-enhanced-targeting-algorithm)
   - [3.4. Reflective Review](#-34-reflective-review)
     - [3.4.1. Summary](#341-summary)
     - [3.4.2. Enhanced testing](#342-enhanced-testing)
@@ -492,7 +492,7 @@ I decided to use preprocessor definitions to store formatting strings (colour co
 
 As described [above](#312-avoiding-global-variables-and-static-classes), preprocessor definitions act as a form of text replacement; they are not global variables. 
  
-### 3.3. Enhanced Targeting algorithm
+### 3.3. Enhanced Targeting Algorithm
  
 As described above, the program includes an enhanced targeting algorithm for seeking out boats. The algorithm has two main components:
 - **Prioritising squares adjacent to 'hits'**
